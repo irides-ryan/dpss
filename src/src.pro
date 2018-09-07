@@ -12,7 +12,12 @@ TARGET = shadowsocks-client
 TEMPLATE = app
 CONFIG += link_pkgconfig
 CONFIG += c++11
-PKGCONFIG += dtkwidget QtShadowsocks dframeworkdbus libqrencode zbar
+
+LIBS += $$PWD/3rd_part/lib/libQtShadowsocks.a $$PWD/3rd_part/lib/libbotan-2.a
+INCLUDEPATH += $$PWD/3rd_part/lib/
+DEPENDPATH += $$PWD/3rd_part/lib/
+
+PKGCONFIG += dtkwidget dframeworkdbus libqrencode zbar
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the

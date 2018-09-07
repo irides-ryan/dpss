@@ -1,7 +1,7 @@
 /*
  * tcpserver.h - Shadowsocks TCP Server
  *
- * Copyright (C) 2015-2017 Symeon Huang <hzwhuang@gmail.com>
+ * Copyright (C) 2015-2018 Symeon Huang <hzwhuang@gmail.com>
  *
  * This file is part of the libQtShadowsocks.
  *
@@ -28,9 +28,10 @@
 #include <memory>
 #include "address.h"
 #include "export.h"
-#include "tcprelay.h"
 
 namespace QSS {
+
+class TcpRelay;
 
 class QSS_EXPORT TcpServer : public QTcpServer
 {
@@ -45,6 +46,8 @@ public:
     ~TcpServer();
 
     TcpServer(const TcpServer &) = delete;
+
+    void setProxy(int proxyType, const std::string& proxyServerAddress, const uint16_t& port);
 
 signals:
     void bytesRead(quint64);
@@ -61,6 +64,12 @@ private:
     const bool autoBan;
     const Address serverAddress;
     const int timeout;
+
+    int m_proxyType;
+    std::string m_proxyServerAddress;
+    uint16_t m_proxyPort;
+    std::string m_proxyUsername;
+    std::string m_proxyPassword;
 
     std::list<std::shared_ptr<TcpRelay> > conList;
 };

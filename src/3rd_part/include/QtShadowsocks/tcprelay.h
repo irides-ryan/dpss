@@ -1,7 +1,7 @@
 /*
  * tcprelay.h - the header file of TcpRelay class
  *
- * Copyright (C) 2014-2016 Symeon Huang <hzwhuang@gmail.com>
+ * Copyright (C) 2014-2018 Symeon Huang <hzwhuang@gmail.com>
  *
  * This file is part of the libQtShadowsocks.
  *
@@ -27,11 +27,15 @@
 #include <QTcpSocket>
 #include <QTimer>
 #include <QTime>
-#include "address.h"
-#include "encryptor.h"
+#include <QtNetwork/QNetworkProxy>
+#include "types/address.h"
+#include "crypto/encryptor.h"
 
 namespace QSS {
 
+/**
+ * The abstract base class representing a Shadowsocks TCP connection
+ */
 class QSS_EXPORT TcpRelay : public QObject
 {
     Q_OBJECT
@@ -40,13 +44,15 @@ public:
              int timeout,
              Address server_addr,
              const std::string& method,
-             const std::string& password,
-             bool is_local,
-             bool autoBan);
+             const std::string& password);
 
     TcpRelay(const TcpRelay &) = delete;
 
     enum STAGE { INIT, ADDR, UDP_ASSOC, DNS, CONNECTING, STREAM, DESTROYED };
+
+    enum PROXY { None, Http, Socks5 };
+
+    void setProxy(int proxyType, std::string& proxyServerAddress, uint16_t& port);
 
 signals:
     /*
@@ -61,31 +67,33 @@ signals:
     void latencyAvailable(int);
     void finished();
 
-private:
+protected:
     static const int64_t RemoteRecvSize = 65536;
 
     STAGE stage;
     Address remoteAddress;
     Address serverAddress;
     std::string dataToWrite;
-    const bool isLocal;
-    const bool autoBan;
 
+    std::unique_ptr<Encryptor> encryptor;
     std::unique_ptr<QTcpSocket> local;
     std::unique_ptr<QTcpSocket> remote;
     std::unique_ptr<QTimer> timer;
     QTime startTime;
-    std::unique_ptr<Encryptor> encryptor;
+    QNetworkProxy proxy;
 
-    void handleStageAddr(std::string &);
     bool writeToRemote(const char *data, size_t length);
 
-private slots:
+    virtual void handleStageAddr(std::string &data) = 0;
+    virtual void handleLocalTcpData(std::string &data) = 0;
+    virtual void handleRemoteTcpData(std::string &data) = 0;
+
+protected slots:
     void onRemoteConnected();
     void onRemoteTcpSocketError();
-    void onRemoteTcpSocketReadyRead();
     void onLocalTcpSocketError();
     void onLocalTcpSocketReadyRead();
+    void onRemoteTcpSocketReadyRead();
     void onTimeout();
     void close();
 };
