@@ -1,5 +1,5 @@
 #include "SSValidator.h"
-#include <QtShadowsocks>
+#include "QtShadowsocks/QtShadowsocks"
 
 QStringList SSValidator::supportedMethodList()
 {
