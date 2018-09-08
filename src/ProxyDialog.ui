@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>440</width>
-    <height>220</height>
+    <height>210</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>240</x>
-     <y>170</y>
+     <y>160</y>
      <width>181</width>
      <height>32</height>
     </rect>
@@ -29,11 +29,11 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBox">
+  <widget class="QCheckBox" name="checkBoxUseProxy">
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>20</y>
+     <y>30</y>
      <width>84</width>
      <height>23</height>
     </rect>
@@ -42,7 +42,7 @@
     <string>Use Proxy</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -51,7 +51,10 @@
      <height>68</height>
     </rect>
    </property>
-   <layout class="QGridLayout" name="gridLayout">
+   <layout class="QGridLayout" name="gridLayout" columnstretch="0,2,0,1">
+    <property name="verticalSpacing">
+     <number>6</number>
+    </property>
     <item row="0" column="0">
      <widget class="QLabel" name="label">
       <property name="text">

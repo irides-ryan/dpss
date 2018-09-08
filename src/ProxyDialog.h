@@ -22,6 +22,7 @@
 #define PROXYDIALOG_H
 
 #include <QDialog>
+#include "stdafx.h"
 
 namespace Ui {
 class ProxyDialog;
@@ -35,8 +36,15 @@ public:
 
     ~ProxyDialog();
 
+private slots:
+    void on_checkBoxUseProxy_stateChanged(int state);
+
+    void on_buttonBox_accepted();
+
 private:
     Ui::ProxyDialog *ui;
+
+    QJsonObject m_confProxy;
 };
 
 #endif // PROXYDIALOG_H
