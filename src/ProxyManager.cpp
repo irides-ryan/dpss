@@ -6,7 +6,19 @@ ProxyManager::ProxyManager(QObject *parent) : QObject(parent) {
     controller = nullptr;
 }
 
-void ProxyManager::setConfig(const QJsonObject &config) {
+void ProxyManager::setConfig(const QJsonObject &config, const QJsonObject &proxy) {
+    getProfile(config, m_profile);
+
+    if (!proxy.isEmpty()) {
+        m_profile.setProxy(proxy["useProxy"].toBool(false));
+        m_profile.setProxyType(proxy["proxyType"].toInt(0));
+        m_profile.setProxyServerAddress(proxy["proxyServer"].toString("").toStdString());
+        m_profile.setProxyPort(proxy["proxyPort"].toInt(8080));
+    }
+}
+
+bool ProxyManager::start() {
+
     if (controller != nullptr) {
         if (isRunning) {
             controller->stop();
@@ -15,15 +27,10 @@ void ProxyManager::setConfig(const QJsonObject &config) {
         disconnectController();
         delete controller;
     }
-    qDebug() << config;
-    QSS::Profile profile;
-    getProfile(config, profile);
-    // profile.enableDebug();
-    controller = new QSS::Controller(profile, true, true, this);
-    connectController();
-}
 
-bool ProxyManager::start() {
+    controller = new QSS::Controller(m_profile, true, true, this);
+    connectController();
+
     bool flag = controller->start();
     if (!flag) {
         Utils::critical("start fail");

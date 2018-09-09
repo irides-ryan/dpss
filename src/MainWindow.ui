@@ -139,7 +139,7 @@
     <string>Forward Proxy...</string>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionAllow_Clients_from_LAN">

@@ -28,7 +28,7 @@ Q_OBJECT
 public:
     ProxyManager(QObject *parent = nullptr);
 
-    void setConfig(const QJsonObject &config);
+    void setConfig(const QJsonObject &config, const QJsonObject &proxy);
 
 signals:
 
@@ -52,6 +52,7 @@ public slots:
 
 private:
     QSS::Controller *controller;
+    QSS::Profile m_profile;
     bool isRunning;
 
     void disconnectController();

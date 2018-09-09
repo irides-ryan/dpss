@@ -368,7 +368,6 @@ void MainWindow::on_actionEnable_System_Proxy_triggered(bool flag) {
     auto guiConfig = GuiConfig::instance();
     if (!flag) {
         proxyManager->stop();
-        // 又混着了，
         systemProxyModeManager->switchToNone();
     } else {
         auto configs = guiConfig->getConfigs();
@@ -378,8 +377,9 @@ void MainWindow::on_actionEnable_System_Proxy_triggered(bool flag) {
             Utils::warning("choose server to start");
         } else {
             auto config = configs.at(index).toObject();
+            auto proxy = guiConfig->get("proxy").toObject();
             guiConfig->updateLastUsed();
-            proxyManager->setConfig(config);
+            proxyManager->setConfig(config, proxy);
             proxyManager->start();
             if(guiConfig->get("global").toBool()){
                 switchToGlobal();
