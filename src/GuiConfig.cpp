@@ -105,8 +105,14 @@ QJsonValue GuiConfig::get(QString key) {
     return v;
 }
 
-void GuiConfig::set(QString key, QJsonValue value) {
-    guiConfig.insert(key, value);
+bool GuiConfig::set(QString key, QJsonValue value) {
+    auto v = guiConfig[key];
+    if (v == value) {
+        return false;
+    } else {
+        guiConfig.insert(key, value);
+        return true;
+    }
 }
 
 QString GuiConfig::getCurrentId() {

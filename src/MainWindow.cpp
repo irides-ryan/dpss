@@ -258,8 +258,17 @@ void MainWindow::on_actionEdit_Online_PAC_URL_triggered() {
 }
 
 void MainWindow::on_actionForward_Proxy_triggered() {
+    auto config = GuiConfig::instance();
     ProxyDialog *dialog = new ProxyDialog(this);
-    dialog->show();
+    dialog->exec();
+    if (dialog->result() == QDialog::Accepted) {
+        if (dialog->isConfigChanged()) {
+            qDebug() << "Forward Proxy Changed, reloading...";
+            auto proxy = config->get("proxy").toObject();
+            proxyManager->setProxy(proxy);
+            proxyManager->start();
+        }
+    }
 }
 
 void MainWindow::on_actionShow_Logs_triggered() {
@@ -379,7 +388,8 @@ void MainWindow::on_actionEnable_System_Proxy_triggered(bool flag) {
             auto config = configs.at(index).toObject();
             auto proxy = guiConfig->get("proxy").toObject();
             guiConfig->updateLastUsed();
-            proxyManager->setConfig(config, proxy);
+            proxyManager->setConfig(config);
+            proxyManager->setProxy(proxy);
             proxyManager->start();
             if(guiConfig->get("global").toBool()){
                 switchToGlobal();

@@ -36,6 +36,8 @@ public:
 
     ~ProxyDialog();
 
+    bool isConfigChanged();
+
 private slots:
     void on_checkBoxUseProxy_stateChanged(int state);
 
@@ -45,6 +47,8 @@ private:
     Ui::ProxyDialog *ui;
 
     QJsonObject m_confProxy;
+
+    bool m_isConfigChanged = false;
 };
 
 #endif // PROXYDIALOG_H

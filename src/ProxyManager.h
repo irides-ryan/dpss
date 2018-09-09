@@ -28,7 +28,9 @@ Q_OBJECT
 public:
     ProxyManager(QObject *parent = nullptr);
 
-    void setConfig(const QJsonObject &config, const QJsonObject &proxy);
+    void setConfig(const QJsonObject &config);
+
+    void setProxy(const QJsonObject &proxy);
 
 signals:
 

@@ -6,14 +6,16 @@ ProxyManager::ProxyManager(QObject *parent) : QObject(parent) {
     controller = nullptr;
 }
 
-void ProxyManager::setConfig(const QJsonObject &config, const QJsonObject &proxy) {
+void ProxyManager::setConfig(const QJsonObject &config) {
     getProfile(config, m_profile);
+}
 
+void ProxyManager::setProxy(const QJsonObject &proxy) {
     if (!proxy.isEmpty()) {
         m_profile.setProxy(proxy["useProxy"].toBool(false));
         m_profile.setProxyType(proxy["proxyType"].toInt(0));
         m_profile.setProxyServerAddress(proxy["proxyServer"].toString("").toStdString());
-        m_profile.setProxyPort(proxy["proxyPort"].toInt(8080));
+        m_profile.setProxyPort(static_cast<uint16_t>(proxy["proxyPort"].toInt(8080)));
     }
 }
 

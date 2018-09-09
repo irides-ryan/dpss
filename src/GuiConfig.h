@@ -46,7 +46,7 @@ public:
 
     QJsonValue get(QString key);
 
-    void set(QString key, QJsonValue value);
+    bool set(QString key, QJsonValue value);
 
     QString getCurrentId();
 

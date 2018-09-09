@@ -17,8 +17,8 @@ ProxyDialog::ProxyDialog(QWidget *parent) :
     int  proxyPort = 8080;
     int  proxyTimeout = 3;
 
-    auto conf_proxy_value = GuiConfig::instance()->get("proxy");
-    if (conf_proxy_value.isUndefined()) {
+    auto configProxy = GuiConfig::instance()->get("proxy");
+    if (configProxy.isUndefined()) {
         // then define it
         m_confProxy.insert("useProxy", usePorxy);
         m_confProxy.insert("proxyType", proxyType);
@@ -27,7 +27,7 @@ ProxyDialog::ProxyDialog(QWidget *parent) :
         m_confProxy.insert("proxyTimeout", proxyTimeout);
         GuiConfig::instance()->set("proxy", m_confProxy);
     } else {
-        m_confProxy = conf_proxy_value.toObject();
+        m_confProxy = configProxy.toObject();
         usePorxy = m_confProxy["useProxy"].toBool(false);
         proxyType = m_confProxy["proxyType"].toInt(0);
         proxyServer = m_confProxy["proxyServer"].toString();
@@ -50,6 +50,10 @@ ProxyDialog::ProxyDialog(QWidget *parent) :
 
 ProxyDialog::~ProxyDialog() {
     delete ui;
+}
+
+bool ProxyDialog::isConfigChanged() {
+    return m_isConfigChanged;
 }
 
 void ProxyDialog::on_checkBoxUseProxy_stateChanged(int state)
@@ -77,6 +81,8 @@ void ProxyDialog::on_buttonBox_accepted()
     m_confProxy["proxyPort"] = ui->lineEditProxyPort->text().toInt();
     m_confProxy["proxyTimeout"] = ui->lineEditTimeout->text().toInt();
 
-    GuiConfig::instance()->set("proxy", m_confProxy);
-    GuiConfig::instance()->saveToDisk();
+    if (GuiConfig::instance()->set("proxy", m_confProxy)) {
+        m_isConfigChanged = true;
+        GuiConfig::instance()->saveToDisk();
+    }
 }
