@@ -523,12 +523,9 @@ void MainWindow::on_actionScan_QRCode_from_Screen_triggered()
                     tr("Can't find any QR code image that contains "
                        "valid URI on your screen(s)."));
     } else {
-        qDebug()<<"scan uri"<<uri;
-        Utils::info(tr("found URI %1").arg(uri));
+        qDebug() << "QR scan: get uri:" << uri;
         if(uri.startsWith("ss://")){
-            qDebug()<<"shadowsocks";
             if(SSValidator::validate(uri)){
-                Utils::info("URI is valid");
                 GuiConfig::instance()->addConfig(uri);
                 updateMenu();
                 on_actionEdit_Servers_triggered();
@@ -543,7 +540,6 @@ void MainWindow::on_actionImport_URL_from_Clipboard_triggered()
 {
     QString uri = QApplication::clipboard()->text();
     if(SSValidator::validate(uri)){
-        Utils::info("URI is valid");
         GuiConfig::instance()->addConfig(uri);
         updateMenu();
         on_actionEdit_Servers_triggered();

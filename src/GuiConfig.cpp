@@ -36,7 +36,7 @@ void GuiConfig::readFromDisk(QString path, bool isFirst) {
     }
     file.open(QIODevice::ReadOnly | QIODevice::Text);
     QJsonDocument d = QJsonDocument::fromJson(file.readAll());
-    qDebug() << d.toJson();
+
     file.close();
     auto json = d.object();
     if (isFirst) {
@@ -44,13 +44,13 @@ void GuiConfig::readFromDisk(QString path, bool isFirst) {
         guiConfig.insert("configs", QJsonArray());
     }
     auto array = json.value("configs").toArray();
-    for (const auto &it:array) {
+    for (const auto it : array) {
         auto c = it.toObject();
         if (!existConfig(it.toObject())) {
             addConfig(it.toObject());
         }
     }
-    qDebug()<<"that's ok";
+
     saveToDisk();
 }
 
@@ -73,7 +73,7 @@ void GuiConfig::saveToDisk(QString path) {
         QJsonDocument d;
         d.setObject(guiConfig);
         file.write(d.toJson());
-        qDebug().noquote().nospace() << d.toJson();
+        // qDebug().noquote().nospace() << d.toJson();
         file.flush();
         file.close();
     }
