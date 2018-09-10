@@ -2,7 +2,7 @@ cmake-build-debug/
 cmake-build-release/
 .idea/
 build/
-*.pro.user
+*.user
 flatpak/
 !flatpak/build_shadowsocks-client.sh
 !flatpak/cn.net.pikachu.shadowsocks-client.json
