@@ -44,7 +44,7 @@ private:
     QJsonArray array;
     bool isModified;
     QJsonObject lastConfig;
-    int lastPos;
+    int lastPos = 0;
 
     void save();
 
