@@ -14,7 +14,7 @@ CONFIG += link_pkgconfig
 CONFIG += c++11
 
 LIBS += $$PWD/3rd_part/lib/libQtShadowsocks.a $$PWD/3rd_part/lib/libbotan-2.a
-INCLUDEPATH += $$PWD/3rd_part/include/
+INCLUDEPATH += $$PWD/3rd_part/include/botan-2 $$PWD/3rd_part/include/QtShadowsocks
 DEPENDPATH += $$PWD/3rd_part/lib/
 
 PKGCONFIG += dtkwidget dframeworkdbus libqrencode zbar

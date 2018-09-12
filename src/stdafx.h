@@ -44,7 +44,7 @@
 #include <unistd.h>
 #include <csignal>
 
-#include "QtShadowsocks/QtShadowsocks"
+#include "QtShadowsocks"
 
 namespace Constant {
 const int WINDOW_MIN_WIDTH = 900;
