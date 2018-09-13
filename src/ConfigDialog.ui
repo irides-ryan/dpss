@@ -220,6 +220,23 @@
   <zorder>groupBox</zorder>
   <zorder>listWidget</zorder>
  </widget>
+ <tabstops>
+  <tabstop>listWidget</tabstop>
+  <tabstop>lineEditServerAddr</tabstop>
+  <tabstop>spinBoxServerPort</tabstop>
+  <tabstop>lineEditPassword</tabstop>
+  <tabstop>comboBoxEncryption</tabstop>
+  <tabstop>lineEditRemarks</tabstop>
+  <tabstop>spinBoxTimeout</tabstop>
+  <tabstop>pushButtonAdd</tabstop>
+  <tabstop>pushButtonDelete</tabstop>
+  <tabstop>pushButtonDuplicate</tabstop>
+  <tabstop>pushButtonMoveUp</tabstop>
+  <tabstop>pushButtonMoveDown</tabstop>
+  <tabstop>spinBoxProxyPort</tabstop>
+  <tabstop>pushButtonOK</tabstop>
+  <tabstop>pushButtonCancel</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
