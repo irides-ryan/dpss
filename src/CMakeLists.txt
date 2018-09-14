@@ -36,7 +36,7 @@ pkg_check_modules(3rd_lib REQUIRED
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${FORMS} ${RESOURCES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS}
-	${CMAKE_SOURCE_DIR}/libQtShadowsocks/lib
+	${CMAKE_SOURCE_DIR}/libQss/lib
 )
 target_link_libraries(${PROJECT_NAME} ${3rd_lib_LIBRARIES} QtShadowsocks)
 
