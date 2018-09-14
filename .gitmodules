@@ -1,0 +1,3 @@
+[submodule "libQtShadowsocks"]
+	path = libQtShadowsocks
+	url = https://github.com/iridescent-rsy/libQtShadowsocks.git

@@ -36,14 +36,9 @@ pkg_check_modules(3rd_lib REQUIRED
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${FORMS} ${RESOURCES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${3rd_lib_INCLUDE_DIRS}
-	${CMAKE_SOURCE_DIR}/src/3rd_part/include/botan-2
-	${CMAKE_SOURCE_DIR}/src/3rd_part/include/QtShadowsocks
+	${CMAKE_SOURCE_DIR}/libQtShadowsocks/lib
 )
-
-target_link_libraries(${PROJECT_NAME} ${3rd_lib_LIBRARIES}
-	${CMAKE_SOURCE_DIR}/src/3rd_part/lib/libQtShadowsocks.a
-	${CMAKE_SOURCE_DIR}/src/3rd_part/lib/libbotan-2.a
-)
+target_link_libraries(${PROJECT_NAME} ${3rd_lib_LIBRARIES} QtShadowsocks)
 
 qt5_use_modules(${PROJECT_NAME} ${QT})
 set(CMAKE_INSTALL_PREFIX /usr)

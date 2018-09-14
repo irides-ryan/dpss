@@ -3,3 +3,5 @@ cmake_minimum_required(VERSION 3.7)
 
 # 添加子目录 src
 add_subdirectory(src)
+
+add_subdirectory(libQtShadowsocks)
