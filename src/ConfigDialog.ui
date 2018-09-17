@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>561</width>
-    <height>392</height>
+    <height>411</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -121,7 +121,7 @@
      <x>21</x>
      <y>270</y>
      <width>178</width>
-     <height>104</height>
+     <height>121</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
@@ -166,7 +166,7 @@
    <property name="geometry">
     <rect>
      <x>360</x>
-     <y>340</y>
+     <y>360</y>
      <width>178</width>
      <height>32</height>
     </rect>
@@ -191,24 +191,34 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>229</x>
+     <x>230</x>
      <y>270</y>
      <width>311</width>
-     <height>30</height>
+     <height>59</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
-    <item>
+   <layout class="QFormLayout" name="formLayout_3">
+    <item row="0" column="0">
      <widget class="QLabel" name="label_7">
       <property name="text">
        <string>Proxy Port</string>
       </property>
      </widget>
     </item>
-    <item>
+    <item row="0" column="1">
      <widget class="QSpinBox" name="spinBoxProxyPort">
       <property name="maximum">
-       <number>36555</number>
+       <number>65536</number>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QCheckBox" name="checkBoxHttpPort">
+      <property name="text">
+       <string>Use Mixed Port</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
@@ -234,6 +244,7 @@
   <tabstop>pushButtonMoveUp</tabstop>
   <tabstop>pushButtonMoveDown</tabstop>
   <tabstop>spinBoxProxyPort</tabstop>
+  <tabstop>checkBoxHttpPort</tabstop>
   <tabstop>pushButtonOK</tabstop>
   <tabstop>pushButtonCancel</tabstop>
  </tabstops>
@@ -246,8 +257,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>588</x>
-     <y>329</y>
+     <x>536</x>
+     <y>343</y>
     </hint>
     <hint type="destinationlabel">
      <x>574</x>

@@ -3,6 +3,8 @@
 #include "GuiConfig.h"
 #include "utils.h"
 
+using QCS = Qt::CheckState;
+
 void ConfigDialog::updateListWidget() {
     auto guiConfig = GuiConfig::instance();
     array = guiConfig->getConfigs();
@@ -12,26 +14,48 @@ void ConfigDialog::updateListWidget() {
     for (auto it:array) {
         ui->listWidget->addItem(it.toObject().value("remarks").toString());
     }
+
+    bool useMixedProxy = guiConfig->get("useMixedProxy").toBool(false);
+    QCS state = useMixedProxy ? QCS::Checked : QCS::Unchecked;
+    ui->checkBoxHttpPort->setCheckState(state);
 }
 
 void ConfigDialog::connectChanged() {
-    connect(ui->lineEditPassword, &QLineEdit::textChanged, this, &ConfigDialog::modified);
-    connect(ui->lineEditRemarks, &QLineEdit::textChanged, this, &ConfigDialog::modified);
-    connect(ui->lineEditServerAddr, &QLineEdit::textChanged, this, &ConfigDialog::modified);
-    connect(ui->spinBoxProxyPort, SIGNAL(valueChanged(int)), this, SLOT(modified()));
-    connect(ui->spinBoxServerPort, SIGNAL(valueChanged(int)), this, SLOT(modified()));
-    connect(ui->spinBoxTimeout, SIGNAL(valueChanged(int)), this, SLOT(modified()));
-    connect(ui->comboBoxEncryption, &QComboBox::currentTextChanged, this, &ConfigDialog::modified);
+    connect(ui->lineEditPassword, &QLineEdit::textChanged,
+            this, &ConfigDialog::modified);
+    connect(ui->lineEditRemarks, &QLineEdit::textChanged,
+            this, &ConfigDialog::modified);
+    connect(ui->lineEditServerAddr, &QLineEdit::textChanged,
+            this, &ConfigDialog::modified);
+    connect(ui->spinBoxProxyPort, SIGNAL(valueChanged(int)),
+            this, SLOT(modified()));
+    connect(ui->spinBoxServerPort, SIGNAL(valueChanged(int)),
+            this, SLOT(modified()));
+    connect(ui->spinBoxTimeout, SIGNAL(valueChanged(int)),
+            this, SLOT(modified()));
+    connect(ui->comboBoxEncryption, &QComboBox::currentTextChanged,
+            this, &ConfigDialog::modified);
+    connect(ui->checkBoxHttpPort, &QCheckBox::stateChanged,
+            this, &ConfigDialog::modified);
 }
 
 void ConfigDialog::disconnectChanged() {
-    disconnect(ui->lineEditPassword, &QLineEdit::textChanged, this, &ConfigDialog::modified);
-    disconnect(ui->lineEditRemarks, &QLineEdit::textChanged, this, &ConfigDialog::modified);
-    disconnect(ui->lineEditServerAddr, &QLineEdit::textChanged, this, &ConfigDialog::modified);
-    disconnect(ui->spinBoxProxyPort, SIGNAL(valueChanged(int)), this, SLOT(modified()));
-    disconnect(ui->spinBoxServerPort, SIGNAL(valueChanged(int)), this, SLOT(modified()));
-    disconnect(ui->spinBoxTimeout, SIGNAL(valueChanged(int)), this, SLOT(modified()));
-    disconnect(ui->comboBoxEncryption, &QComboBox::currentTextChanged, this, &ConfigDialog::modified);
+    disconnect(ui->lineEditPassword, &QLineEdit::textChanged,
+               this, &ConfigDialog::modified);
+    disconnect(ui->lineEditRemarks, &QLineEdit::textChanged,
+               this, &ConfigDialog::modified);
+    disconnect(ui->lineEditServerAddr, &QLineEdit::textChanged,
+               this, &ConfigDialog::modified);
+    disconnect(ui->spinBoxProxyPort, SIGNAL(valueChanged(int)),
+               this, SLOT(modified()));
+    disconnect(ui->spinBoxServerPort, SIGNAL(valueChanged(int)),
+               this, SLOT(modified()));
+    disconnect(ui->spinBoxTimeout, SIGNAL(valueChanged(int)),
+               this, SLOT(modified()));
+    disconnect(ui->comboBoxEncryption, &QComboBox::currentTextChanged,
+               this, &ConfigDialog::modified);
+    disconnect(ui->checkBoxHttpPort, &QCheckBox::stateChanged,
+               this, &ConfigDialog::modified);
 }
 
 ConfigDialog::ConfigDialog(QWidget *parent) :
@@ -49,7 +73,6 @@ ConfigDialog::ConfigDialog(QWidget *parent) :
     ui->comboBoxEncryption->addItems(methodList);
     connectChanged();
 
-    //    disconnectChanged();
     ui->listWidget->setCurrentRow(0);
     Dtk::Widget::moveToCenter(this);
 }
@@ -68,6 +91,9 @@ void ConfigDialog::save() {
     lastConfig.insert("method", ui->comboBoxEncryption->currentText());
     array.replace(lastPos, lastConfig);
     GuiConfig::instance()->setConfigs(array);
+
+    bool useMixedProxy = ui->checkBoxHttpPort->checkState() == QCS::Checked;
+    GuiConfig::instance()->set("useMixedProxy", useMixedProxy);
 }
 
 void ConfigDialog::modified() {
@@ -77,7 +103,10 @@ void ConfigDialog::modified() {
 
 void ConfigDialog::checkModify() {
     if (isModified) {
-        auto ret = QMessageBox::information(nullptr, "warning", "Your config is modified. Do you want to save it?",
+        auto ret = QMessageBox::information(nullptr,
+                                            "warning",
+                                            "Your config is modified. "
+                                            "Do you want to save it?",
                                             QMessageBox::Yes | QMessageBox::No);
         if (ret == QMessageBox::Yes) {
             save();
@@ -124,7 +153,9 @@ void ConfigDialog::on_pushButtonAdd_clicked() {
 }
 
 void ConfigDialog::on_pushButtonDelete_clicked() {
-    int ret = QMessageBox::warning(nullptr, "warning", "Are you sure?", QMessageBox::Yes | QMessageBox::No);
+    int ret = QMessageBox::warning(nullptr,
+                                   "warning", "Are you sure?",
+                                   QMessageBox::Yes | QMessageBox::No);
     if (ret == QMessageBox::No) {
         return;
     }
@@ -185,6 +216,5 @@ void ConfigDialog::on_pushButtonMoveDown_clicked() {
 
 void ConfigDialog::on_pushButtonOK_clicked() {
     checkModify();
-    GuiConfig::instance()->setConfigs(array);
     close();
 }

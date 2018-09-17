@@ -36,7 +36,6 @@ public:
     ~ConfigDialog();
 
 private slots:
-
     void on_listWidget_currentRowChanged(int currentRow);
 
 private:
@@ -47,29 +46,18 @@ private:
     int lastPos = 0;
 
     void save();
-
     void checkModify();
-
     void updateListWidget();
-
     void connectChanged();
-
     void disconnectChanged();
 
 private slots:
-
     void modified();
-
     void on_pushButtonAdd_clicked();
-
     void on_pushButtonDelete_clicked();
-
     void on_pushButtonDuplicate_clicked();
-
     void on_pushButtonMoveUp_clicked();
-
     void on_pushButtonMoveDown_clicked();
-
     void on_pushButtonOK_clicked();
 };
 
