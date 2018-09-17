@@ -4,7 +4,7 @@ build/
 
 .idea/
 .vscode/
-*.user.*
+*.user*
 
 flatpak/
 !flatpak/build_shadowsocks-client.sh
