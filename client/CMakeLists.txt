@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.7)
-project(shadowsocks-client)
+
+project(
+    client
+    VERSION 1.3.0
+    LANGUAGES CXX
+)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -55,7 +60,7 @@ foreach (ICON_SIZE 16 24 32 48 64 96 128 256)
 endforeach ()
 
 # Install bin
-install(TARGETS shadowsocks-client DESTINATION bin)
+install(TARGETS client DESTINATION bin)
 
 # Install desktop shortcuts
 install(FILES ../shadowsocks-client.desktop DESTINATION share/applications)
