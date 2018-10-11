@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.7)
 
 project(
-    client
+    qss-client
     VERSION 1.3.0
     LANGUAGES CXX
 )
@@ -16,7 +16,7 @@ if (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug"))
     set(CMAKE_CXX_FLAGS -O3)
     # generate qm files
     execute_process(COMMAND bash "translate_generation.sh"
-                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src)
+                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/client)
 else ()
     set(CMAKE_CXX_COMPILER "clang++")
 endif ()
@@ -50,7 +50,7 @@ set(CMAKE_INSTALL_PREFIX /usr)
 
 # Install qm files
 file(GLOB QM_FILES "translations/*.qm")
-install(FILES ${QM_FILES} DESTINATION share/shadowsocks-client/translations)
+install(FILES ${QM_FILES} DESTINATION share/qss-client/translations)
 
 # Install icons
 foreach (ICON_SIZE 16 24 32 48 64 96 128 256)
@@ -60,7 +60,7 @@ foreach (ICON_SIZE 16 24 32 48 64 96 128 256)
 endforeach ()
 
 # Install bin
-install(TARGETS client DESTINATION bin)
+install(TARGETS qss-client DESTINATION bin)
 
 # Install desktop shortcuts
 install(FILES ../shadowsocks-client.desktop DESTINATION share/applications)
