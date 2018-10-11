@@ -46,13 +46,15 @@ ShareDialog::ShareDialog(QWidget *parent) :
 
 ShareDialog::~ShareDialog()
 {
+    delete listView;
+    delete qrWidget;
+    delete uriLabel;
+    delete saveButton;
     qDebug()<<"ShareDialog::~ShareDialog()";
 }
 
 void ShareDialog::closeEvent(QCloseEvent *)
 {
-    qDebug()<<"set list view to nullptr";
-    listView->setParent(nullptr);
 }
 
 void ShareDialog::onItemSelected()

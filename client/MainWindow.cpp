@@ -557,10 +557,12 @@ void MainWindow::on_actionImport_URL_from_Clipboard_triggered()
 
 void MainWindow::on_actionShare_Server_Config_triggered()
 {
-    // 这里肯定是有内存泄露的，但是我只要一析构，程序就崩溃了
+    // ? 这里肯定是有内存泄露的，但是我只要一析构，程序就崩溃了 ?
+    // TODO Need More Info: the crush does not recur.
     // 生成分享的二维码
     ShareDialog* d = new ShareDialog();
     d->exec();
+    delete d;
 }
 
 void MainWindow::on_actionExport_as_gui_config_json_triggered()
