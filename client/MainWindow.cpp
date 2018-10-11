@@ -385,15 +385,22 @@ void MainWindow::on_actionEnable_System_Proxy_triggered(bool flag) {
             //TODO: choose a server to start
             Utils::warning("choose server to start");
         } else {
-            auto config = configs.at(index).toObject();
+            auto config = configs[index].toObject();
             auto proxy = guiConfig->get("proxy").toObject();
             guiConfig->updateLastUsed();
+
+            // setConfig will check the config parameters and correct them.
             proxyManager->setConfig(config);
             proxyManager->setProxy(proxy);
             proxyManager->start();
-            if(guiConfig->get("global").toBool()){
+
+            // if config parameters were corrected, save them.
+            configs[index] = config;
+            guiConfig->setConfigs(configs);
+
+            if(guiConfig->get("global").toBool()) {
                 switchToGlobal();
-            } else{
+            } else {
                 switchToPacMode();
             }
         }

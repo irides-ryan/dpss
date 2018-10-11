@@ -6,7 +6,7 @@ ProxyManager::ProxyManager(QObject *parent) : QObject(parent) {
     controller = nullptr;
 }
 
-void ProxyManager::setConfig(const QJsonObject &config) {
+void ProxyManager::setConfig(QJsonObject &config) {
     getProfile(config, m_profile);
 }
 
@@ -62,43 +62,46 @@ void ProxyManager::connectController() {
     connect(controller, &QSS::Controller::tcpLatencyAvailable, this, &ProxyManager::tcpLatencyAvailable);
 }
 
-void ProxyManager::getProfile(const QJsonObject &config, QSS::Profile &profile) {
-    QString server = config.value("server").toString();
+void ProxyManager::getProfile(QJsonObject &config, QSS::Profile &profile) {
+    QString server = config["server"].toString();
     if (server.isEmpty()) {
         Utils::critical("server is empty.");
     }
     profile.setServerAddress(server.toStdString());
-    QString password = config.value("password").toString();
+    QString password = config["password"].toString();
     if (password.isEmpty()) {
         Utils::warning("password is empty.");
     }
     profile.setPassword(password.toStdString());
-    int server_port = config.value("server_port").toInt();
+    int server_port = config["server_port"].toInt();
     if (server_port == 0) {
         Utils::warning("server port is 0.");
     }
     profile.setServerPort(server_port);
-    QString method = config.value("method").toString();
+    QString method = config["method"].toString();
     if (method.isEmpty()) {
         Utils::warning("method is empty.");
     }
     profile.setMethod(method.toStdString());
-    int timeout = config.value("timeout").toInt() * 10;
+    int timeout = config["timeout"].toInt() * 10;
     if (timeout == 0) {
         Utils::warning("timeout is 0. we will change the value to 6.");
         timeout = 6;
+        config.insert("timeout", timeout);
     }
     profile.setTimeout(timeout);
-    int local_port = config.value("local_port").toInt();
+    int local_port = config["local_port"].toInt();
     if (local_port == 0) {
         Utils::warning("local_port is 0. we will change the value to 1080.");
         local_port = 1080;
+        config.insert("local_port", local_port);
     }
     profile.setLocalPort(local_port);
-    QString local_addr = config.value("local_address").toString();
+    QString local_addr = config["local_address"].toString();
     if (local_addr.isEmpty()) {
         Utils::warning("local address is empty. we will change the value to 127.0.0.1.");
         local_addr = "127.0.0.1";
+        config.insert("local_addr", local_addr);
     }
     profile.setLocalAddress(local_addr.toStdString());
 }

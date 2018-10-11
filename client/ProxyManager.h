@@ -28,7 +28,7 @@ Q_OBJECT
 public:
     ProxyManager(QObject *parent = nullptr);
 
-    void setConfig(const QJsonObject &config);
+    void setConfig(QJsonObject &config);
 
     void setProxy(const QJsonObject &proxy);
 
@@ -61,7 +61,7 @@ private:
 
     void connectController();
 
-    void getProfile(const QJsonObject &config, QSS::Profile &profile);
+    void getProfile(QJsonObject &config, QSS::Profile &profile);
 };
 
 #endif // PROXYMANAGER_H
