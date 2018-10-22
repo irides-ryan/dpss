@@ -15,54 +15,19 @@
 #include "SSValidator.h"
 #include "ShareDialog.h"
 #include <DDesktopServices>
+
 MainWindow::MainWindow(QWidget *parent) :
     DMainWindow(parent),
     ui(new Ui::MainWindow) {
     ui->setupUi(this);
-    installEventFilter(this);   // add event filter
+    installEventFilter(this);
     GuiConfig::instance()->readFromDisk();
-    w = new DMainWindow();
-    settings = new Settings(this);
-    settings->init();
 
-    // Init window size.
-    int width = Constant::WINDOW_MIN_WIDTH;
-    int height = Constant::WINDOW_MIN_HEIGHT;
-
-    if (!settings->getOption("window_width").isNull()) {
-        width = settings->getOption("window_width").toInt();
-    }
-
-    if (!settings->getOption("window_height").isNull()) {
-        height = settings->getOption("window_height").toInt();
-    }
-
-    w->resize(width, height);
-    rightMenu = new QMenu(this);
-    rightMenuBlank = new QMenu(this);
-    menuAdd = new QMenu(tr("Add"),this);
-    config_view = new ProfileView(getColumnHideFlags());
-//    config_view->setColumnSortingAlgorithms(alorithms, getSortingIndex(), getSortingOrder());
-    config_view->setSearchAlgorithm(&ProfileItem::search);
-    connect(config_view, &ProfileView::rightClickItems, this, &MainWindow::popupMenu);
-    connect(config_view, &ProfileView::rightClickBlank, this, &MainWindow::popupMenuBlank);
-    w->setCentralWidget(config_view);
     systemTrayIcon = new QSystemTrayIcon();
     systemTrayIcon->setContextMenu(ui->menuTray);
     systemTrayIcon->setIcon(QIcon(Utils::getIconQrcPath("ss16.png")));
     systemTrayIcon->show();
-    const auto &titlebar = w->titlebar();
-    if (titlebar != nullptr) {
-        auto menu = new QMenu();
-        menu->setStyle(QStyleFactory::create("dlight"));
-        menu->addAction(ui->actionImport_from_gui_config_json);
-        menu->addAction(ui->actionExport_as_gui_config_json);
-        menu->addSeparator();
-        toolbar = new Toolbar();
-        titlebar->setCustomWidget(toolbar, Qt::AlignVCenter, false);
-        titlebar->setMenu(menu);
-        connect(toolbar, &Toolbar::search, config_view, &ProfileView::search, Qt::QueuedConnection);
-    }
+
     proxyManager = new ProxyManager(this);
     const auto &guiConfig = GuiConfig::instance();
     systemProxyModeManager = new DDEProxyModeManager(this);
@@ -78,20 +43,23 @@ MainWindow::MainWindow(QWidget *parent) :
     out = 0;
     ins.clear();
     outs.clear();
+
     auto timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::updateTrayIcon);
-    connect(timer, &QTimer::timeout, this, &MainWindow::updateList);
     timer->start(100);
+
     // 流量监控
     connect(proxyManager, &ProxyManager::bytesReceivedChanged, [=](quint64 n) {
         qDebug() << "bytesReceivedChanged" << n;
         term_usage_in = n;
-        GuiConfig::instance()->setCurrentTermUsage(term_usage_in + term_usage_out);
+        GuiConfig::instance()->setCurrentTermUsage(term_usage_in
+                                                   + term_usage_out);
     });
     connect(proxyManager, &ProxyManager::bytesSentChanged, [=](quint64 n) {
         qDebug() << "bytesSentChanged" << n;
         term_usage_out = n;
-        GuiConfig::instance()->setCurrentTermUsage(term_usage_in + term_usage_out);
+        GuiConfig::instance()->setCurrentTermUsage(term_usage_in
+                                                   + term_usage_out);
     });
     connect(proxyManager, &ProxyManager::newBytesReceived, [=](quint64 n) {
         qDebug() << "newBytesReceived" << n;
@@ -103,9 +71,9 @@ MainWindow::MainWindow(QWidget *parent) :
         out += n;
         GuiConfig::instance()->addTotalUsage(n);
     });
+
     updateTrayIcon();
     on_actionStart_on_Boot_triggered(guiConfig->get("autostart").toBool(true));
-    updateList();
     updateMenu();
 }
 
@@ -130,7 +98,8 @@ void MainWindow::switchToPacMode() {
         QString pac_file = QDir(Utils::configPath()).filePath("autoproxy.pac");
         QFile file(pac_file);
         if (!file.exists()) {
-            Utils::warning("local pac is not exist. we will use on pac file. you can change it");
+            Utils::warning("local pac is not exist. we will use on pac file. "
+                           "you can change it");
             pacURI = online_pac_uri;
             guiConfig->set("pacUrl", pacURI);
             guiConfig->set("useOnlinePac", true);
@@ -184,85 +153,23 @@ void MainWindow::updateTrayIcon() {
     systemTrayIcon->setIcon(QIcon(Utils::getIconQrcPath(icon)));
 }
 
-void MainWindow::updateList() {
-
-//    QList<DSimpleListItem *> items;
-//    auto configs = GuiConfig::instance()->getConfigs();
-//    for (int i = 0; i < configs.size(); i++) {
-//        auto it = configs.at(i).toObject();
-//        auto item = new ProfileItem(it);
-//        items << static_cast<DSimpleListItem *>(item);
-//    }
-//    // note: this function will delete items in view before  to avoid *MEMORY LEAK*
-//    config_view->refreshItems(items);
-
-}
-
-void MainWindow::popupMenu(QPoint pos, QList<DSimpleListItem *> items) {
-    if (items.size() == 1) {
-        auto item = items.first();
-        auto t = static_cast<ProfileItem *>(item);
-        QList<QAction *> action_list;
-        action_list << ui->actionConnect << ui->actionDisconnect;
-        if (GuiConfig::instance()->get("enabled").toBool()) {
-            if (t->getId() == GuiConfig::instance()->getCurrentId()) {
-                ui->actionConnect->setEnabled(false);
-                ui->actionDisconnect->setEnabled(true);
-            } else {
-                ui->actionConnect->setEnabled(true);
-                ui->actionDisconnect->setEnabled(false);
-            }
-        } else {
-            ui->actionConnect->setEnabled(true);
-            ui->actionDisconnect->setEnabled(false);
-        }
-        auto index = GuiConfig::instance()->getIndexById(t->getId());
-        connect(ui->actionConnect, &QAction::triggered, [=]() {
-            if (index < 0) {
-                qDebug() << "no such config id";
-            } else {
-                GuiConfig::instance()->set("index", index);
-                on_actionEnable_System_Proxy_triggered(true);
-            }
-        });
-        rightMenu->clear();
-        rightMenu->addActions(action_list);
-        rightMenu->exec(pos);
-    }
-}
-
-void MainWindow::popupMenuBlank()
-{
-    rightMenuBlank->clear();
-    QList<QAction*> action_list;
-    menuAdd->clear();
-    action_list<<ui->actionImport_from_gui_config_json<<ui->actionScan_QRCode_from_Screen<<ui->actionImport_URL_from_Clipboard;
-    menuAdd->addActions(action_list);
-    rightMenuBlank->addMenu(menuAdd);
-    action_list.clear();
-    action_list<<ui->actionEdit_Servers;
-    rightMenuBlank->addActions(action_list);
-    rightMenuBlank->exec(QCursor::pos());
-}
-
 void MainWindow::on_actionEdit_Servers_triggered() {
-    ConfigDialog *dialog = new ConfigDialog();
-
-    dialog->exec();
+    ConfigDialog dialog(this);
+    dialog.exec();
     updateMenu();
 }
 
 void MainWindow::on_actionEdit_Online_PAC_URL_triggered() {
-    PACUrlDialog *dialog = new PACUrlDialog(this);
-    dialog->show();
+    PACUrlDialog dialog(this);
+    dialog.show();
 }
 
 void MainWindow::on_actionForward_Proxy_triggered() {
     auto config = GuiConfig::instance();
-    ProxyDialog *dialog = new ProxyDialog(this);
-    dialog->exec();
-    if (dialog->result() == QDialog::Accepted) {
-        if (dialog->isConfigChanged()) {
+    ProxyDialog dialog(this);
+    dialog.exec();
+    if (dialog.result() == QDialog::Accepted) {
+        if (dialog.isConfigChanged()) {
             qDebug() << "Forward Proxy Changed, reloading...";
             auto proxy = config->get("proxy").toObject();
             proxyManager->setProxy(proxy);
@@ -272,8 +179,8 @@ void MainWindow::on_actionForward_Proxy_triggered() {
 }
 
 void MainWindow::on_actionShow_Logs_triggered() {
-    LogMainWindow *w = new LogMainWindow(this);
-    w->show();
+    LogMainWindow w(this);
+    w.show();
 }
 
 void MainWindow::updateMenu() {
@@ -333,7 +240,9 @@ void MainWindow::updateMenu() {
     auto configs = guiConfig->getConfigs();
     ui->menuServers->clear();
     QList<QAction *> action_list;
-    action_list << ui->actionLoad_Balance << ui->actionHigh_Availability << ui->actionChoose_by_statistics;
+    action_list << ui->actionLoad_Balance
+                << ui->actionHigh_Availability
+                << ui->actionChoose_by_statistics;
     ui->menuServers->addActions(action_list);
     ui->menuServers->addSeparator();
     action_list.clear();
@@ -345,16 +254,21 @@ void MainWindow::updateMenu() {
             on_actionEnable_System_Proxy_triggered(true);
         });
         action->setCheckable(true);
-        if (guiConfig->get("enabled").toBool() && guiConfig->get("index").toInt() == i) {
+        if (guiConfig->get("enabled").toBool()
+            && guiConfig->get("index").toInt() == i) {
             action->setChecked(true);
         }
     }
     ui->menuServers->addSeparator();
-    action_list << ui->actionEdit_Servers << ui->actionStatistics_Config<<ui->actionImport_from_gui_config_json<<ui->actionExport_as_gui_config_json;
+    action_list << ui->actionEdit_Servers
+                << ui->actionStatistics_Config
+                << ui->actionImport_from_gui_config_json
+                << ui->actionExport_as_gui_config_json;
     ui->menuServers->addActions(action_list);
     ui->menuServers->addSeparator();
     ui->menuServers->addSeparator();
-    action_list << ui->actionShare_Server_Config << ui->actionScan_QRCode_from_Screen
+    action_list << ui->actionShare_Server_Config
+                << ui->actionScan_QRCode_from_Screen
                 << ui->actionImport_URL_from_Clipboard;
     ui->menuServers->addActions(action_list);
     ui->menuServers->addSeparator();
@@ -364,8 +278,11 @@ void MainWindow::updateMenu() {
 }
 
 void MainWindow::on_actionImport_from_gui_config_json_triggered() {
-    QString filename = QFileDialog::getOpenFileName(this, "choose gui-config.json file", QDir::homePath(),
-                                                    "gui-config.json");
+    QString filename = QFileDialog::getOpenFileName(
+          this, "choose gui-config.json file",
+          QDir::homePath(),
+          "gui-config.json"
+    );
     if (filename.isEmpty()) {
         return;
     }
@@ -464,23 +381,6 @@ void MainWindow::on_actionQuit_triggered() {
     qApp->exit();
 }
 
-QList<bool> MainWindow::getColumnHideFlags() {
-    QString processColumns = settings->getOption("config_columns").toString();
-
-    QList<bool> toggleHideFlags;
-    toggleHideFlags << processColumns.contains("name");
-    toggleHideFlags << processColumns.contains("server");
-    toggleHideFlags << processColumns.contains("status");
-    toggleHideFlags << processColumns.contains("latency");
-    toggleHideFlags << processColumns.contains("local_port");
-    toggleHideFlags << processColumns.contains("term_usage");
-    toggleHideFlags << processColumns.contains("total_usage");
-    toggleHideFlags << processColumns.contains("reset_date");
-    toggleHideFlags << processColumns.contains("last_used");
-
-    return toggleHideFlags;
-}
-
 bool MainWindow::eventFilter(QObject *, QEvent *event) {
     //    qDebug()<<event->type();
     if (event->type() == QEvent::WindowStateChange) {
@@ -493,30 +393,9 @@ bool MainWindow::eventFilter(QObject *, QEvent *event) {
             }
         }
     } else if (event->type() == QEvent::Close) {
-        if (w->rect().width() >= Constant::WINDOW_MIN_WIDTH) {
-            settings->setOption("window_width", this->rect().width());
-        }
-
-        if (w->rect().height() >= Constant::WINDOW_MIN_HEIGHT) {
-            settings->setOption("window_height", this->rect().height());
-        }
     }
 
     return false;
-}
-
-int MainWindow::getSortingIndex() {
-    QString sortingName = settings->getOption("config_sorting_column").toString();
-
-    QList<QString> columnNames = {
-        "name", "server", "status", "latency", "local_port", "term_usage", "total_usage", "reset_date", "last_used"
-    };
-    qDebug() << "??";
-    return columnNames.indexOf(sortingName);
-}
-
-bool MainWindow::getSortingOrder() {
-    return settings->getOption("config_sorting_order").toBool();
 }
 
 void MainWindow::on_actionDisconnect_triggered() {
@@ -563,19 +442,22 @@ void MainWindow::on_actionShare_Server_Config_triggered()
     // ? 这里肯定是有内存泄露的，但是我只要一析构，程序就崩溃了 ?
     // TODO Need More Info: the crush does not recur.
     // 生成分享的二维码
-    ShareDialog* d = new ShareDialog();
-    d->exec();
-    delete d;
+    ShareDialog dialog(this);
+    dialog.exec();
 }
 
 void MainWindow::on_actionExport_as_gui_config_json_triggered()
 {
-    QString filename = QFileDialog::getExistingDirectory(nullptr,tr("Save gui-config.json"),
-                                                         QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation).first());
+    using QSP = QStandardPaths;
+    QString filename = QFileDialog::getExistingDirectory(
+          nullptr,
+          tr("Save gui-config.json"),
+          QSP::standardLocations(QSP::DocumentsLocation).first()
+    );
     if(filename.isEmpty()){
         return;
     }
-    filename=filename+"/gui-config.json";
+    filename = filename + "/gui-config.json";
     GuiConfig::instance()->saveToDisk(filename);
     DDesktopServices::showFileItem(filename);
 }

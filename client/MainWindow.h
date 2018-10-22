@@ -40,20 +40,10 @@ class MainWindow : public DMainWindow {
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-
     ~MainWindow() override;
-
-    QList<bool> getColumnHideFlags();
-
     bool eventFilter(QObject *, QEvent *) override ;
 
-    bool getSortingOrder();
-
-    int getSortingIndex();
-
-
 private slots:
-
     void on_actionEdit_Servers_triggered();
     void on_actionEdit_Online_PAC_URL_triggered();
     void on_actionForward_Proxy_triggered();
@@ -65,9 +55,6 @@ private slots:
     void updateTrayIcon();
     void on_actionStart_on_Boot_triggered(bool checked);
     void on_actionQuit_triggered();
-    void updateList();
-    void popupMenu(QPoint pos, QList<DSimpleListItem *> items);
-    void popupMenuBlank();
     void on_actionDisconnect_triggered();
     void on_actionScan_QRCode_from_Screen_triggered();
     void on_actionImport_URL_from_Clipboard_triggered();
