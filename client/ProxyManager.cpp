@@ -19,6 +19,10 @@ void ProxyManager::setProxy(const QJsonObject &proxy) {
     }
 }
 
+void ProxyManager::setMixedProxy(bool useMixedProxy) {
+    m_profile.setMixedProxy(useMixedProxy);
+}
+
 bool ProxyManager::start() {
 
     if (controller != nullptr) {

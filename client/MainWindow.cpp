@@ -389,9 +389,12 @@ void MainWindow::on_actionEnable_System_Proxy_triggered(bool flag) {
             auto proxy = guiConfig->get("proxy").toObject();
             guiConfig->updateLastUsed();
 
+            bool useMixedProxy = guiConfig->get("useMixedProxy").toBool(false);
+
             // setConfig will check the config parameters and correct them.
             proxyManager->setConfig(config);
             proxyManager->setProxy(proxy);
+            proxyManager->setMixedProxy(useMixedProxy);
             proxyManager->start();
 
             // if config parameters were corrected, save them.
