@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.7)
 
 project(
-    qss-client
+    dpss
     VERSION 1.3.0
     LANGUAGES CXX
 )
@@ -50,7 +50,7 @@ set(CMAKE_INSTALL_PREFIX /usr)
 
 # Install qm files
 file(GLOB QM_FILES "translations/*.qm")
-install(FILES ${QM_FILES} DESTINATION share/qss-client/translations)
+install(FILES ${QM_FILES} DESTINATION share/dpss/translations)
 
 # Install icons
 foreach (ICON_SIZE 16 24 32 48 64 96 128 256)
@@ -60,7 +60,7 @@ foreach (ICON_SIZE 16 24 32 48 64 96 128 256)
 endforeach ()
 
 # Install bin
-install(TARGETS qss-client DESTINATION bin)
+install(TARGETS dpss DESTINATION bin)
 
 # Install desktop shortcuts
 install(FILES ../dpss.desktop DESTINATION share/applications)
