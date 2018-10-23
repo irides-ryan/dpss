@@ -40,25 +40,23 @@ private slots:
 
 private:
     Ui::ConfigDialog *ui;
-    QJsonArray array;
-    bool isModified;
-    QJsonObject lastConfig;
-    int lastPos = 0;
+    QJsonArray m_configs;
+    int m_currentPos;
+    bool m_isConfigChanged;
 
     void save();
-    void checkModify();
-    void updateListWidget();
-    void connectChanged();
-    void disconnectChanged();
+    void stashConfig(int index);
+    void showConfig(int index);
+    bool isConfigChanged();
 
 private slots:
-    void modified();
     void on_pushButtonAdd_clicked();
     void on_pushButtonDelete_clicked();
     void on_pushButtonDuplicate_clicked();
     void on_pushButtonMoveUp_clicked();
     void on_pushButtonMoveDown_clicked();
     void on_pushButtonOK_clicked();
+    void on_lineEditRemarks_textEdited(const QString &arg1);
 };
 
 #endif // CONFIGDIALOG_H
