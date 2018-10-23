@@ -55,7 +55,7 @@ install(FILES ${QM_FILES} DESTINATION share/qss-client/translations)
 # Install icons
 foreach (ICON_SIZE 16 24 32 48 64 96 128 256)
     install(FILES Resources/ssw${ICON_SIZE}.svg
-            RENAME shadowsocks-client.svg
+            RENAME dpss.svg
             DESTINATION share/icons/hicolor/${ICON_SIZE}x${ICON_SIZE}/apps)
 endforeach ()
 
@@ -63,4 +63,4 @@ endforeach ()
 install(TARGETS qss-client DESTINATION bin)
 
 # Install desktop shortcuts
-install(FILES ../shadowsocks-client.desktop DESTINATION share/applications)
+install(FILES ../dpss.desktop DESTINATION share/applications)
