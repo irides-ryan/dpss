@@ -25,7 +25,10 @@ int main(int argc, char *argv[]) {
         signal(SIGINT, onSignalRecv);
         signal(SIGTERM, onSignalRecv);
         app.setTheme("light");
-        app.loadTranslator();
+
+        QTranslator *translator = new QTranslator();
+        translator->load(QLocale::system(), "dpss", "_", ":/i18n");
+        app.installTranslator(translator);
 
         const QString descriptionText = QApplication::tr(
                     "If you want to keep a secret, you must also hide it from yourself.");

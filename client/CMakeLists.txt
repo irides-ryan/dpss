@@ -15,8 +15,8 @@ set(CMAKE_AUTOUIC ON)
 if (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug"))
     set(CMAKE_CXX_FLAGS -O3)
     # generate qm files
-    execute_process(COMMAND bash "translate_generation.sh"
-                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/client)
+    execute_process(COMMAND bash "gen_i18n.sh"
+                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/client/i18n)
 else ()
     set(CMAKE_CXX_COMPILER "clang++")
 endif ()
@@ -49,8 +49,8 @@ qt5_use_modules(${PROJECT_NAME} ${QT})
 set(CMAKE_INSTALL_PREFIX /usr)
 
 # Install qm files
-file(GLOB QM_FILES "translations/*.qm")
-install(FILES ${QM_FILES} DESTINATION share/dpss/translations)
+# file(GLOB QM_FILES "translations/*.qm")
+# install(FILES ${QM_FILES} DESTINATION share/dpss/translations)
 
 # Install icons
 foreach (ICON_SIZE 16 24 32 48 64 96 128 256)
