@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
         <file>i18n/dpss_zh.qm</file>
-        <file>i18n/dpss_en.qm</file>
     </qresource>
 </RCC>

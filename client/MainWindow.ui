@@ -178,8 +178,7 @@
   </action>
   <action name="action_Edit_User_Rule_for_GFWList">
    <property name="text">
-    <string>
-Edit User Rule for GFWList...</string>
+    <string>Edit User Rule for GFWList...</string>
    </property>
   </action>
   <action name="actionSecure_Local_PAC">
