@@ -125,6 +125,33 @@ void MainWindow::switchToGlobal() {
     systemProxyModeManager->switchToManual(local_address, local_port);
 }
 
+bool MainWindow::startss() {
+    proxyManager->stop();
+
+    auto guiConfig = GuiConfig::instance();
+    auto configs = guiConfig->getConfigs();
+    auto index = guiConfig->get("index").toInt();
+    if (0 == configs.size()) {
+        return false;
+    } else if (index > configs.size() - 1) {
+        index = configs.size() - 1;
+    }
+
+    auto config = guiConfig->getConfigs()[index].toObject();
+    auto useMixedProxy = guiConfig->get("useMixedProxy").toBool();
+    auto proxy = guiConfig->get("proxy").toObject();
+    proxyManager->setConfig(config);
+    proxyManager->setMixedProxy(useMixedProxy);
+    proxyManager->setProxy(proxy);
+    bool succeed = proxyManager->start();
+
+    // if config parameters were corrected, save them.
+    configs[index] = config;
+    guiConfig->setConfigs(configs);
+
+    return succeed;
+}
+
 void MainWindow::contextMenuEvent(QContextMenuEvent *)
 {
     qDebug()<<"right click";
@@ -156,6 +183,9 @@ void MainWindow::updateTrayIcon() {
 void MainWindow::on_actionEdit_Servers_triggered() {
     ConfigDialog dialog(this);
     dialog.exec();
+    if (dialog.isConfigChanged()) {
+        startss();
+    }
     updateMenu();
 }
 
@@ -171,9 +201,7 @@ void MainWindow::on_actionForward_Proxy_triggered() {
     if (dialog.result() == QDialog::Accepted) {
         if (dialog.isConfigChanged()) {
             qDebug() << "Forward Proxy Changed, reloading...";
-            auto proxy = config->get("proxy").toObject();
-            proxyManager->setProxy(proxy);
-            proxyManager->start();
+            startss();
         }
     }
 }
@@ -184,7 +212,7 @@ void MainWindow::on_actionShow_Logs_triggered() {
 }
 
 void MainWindow::updateMenu() {
-    const auto &guiConfig = GuiConfig::instance();
+    auto guiConfig = GuiConfig::instance();
     //    qDebug() << guiConfig->getConfigs();
     if (guiConfig->get("enabled").toBool()) {
         ui->actionEnable_System_Proxy->setChecked(true);
@@ -296,33 +324,12 @@ void MainWindow::on_actionEnable_System_Proxy_triggered(bool flag) {
         proxyManager->stop();
         systemProxyModeManager->switchToNone();
     } else {
-        auto configs = guiConfig->getConfigs();
-        auto index = guiConfig->get("index").toInt();
-        if (configs.size() < index + 1) {
-            //TODO: choose a server to start
-            Utils::warning("choose server to start");
+        startss();
+
+        if(guiConfig->get("global").toBool()) {
+            switchToGlobal();
         } else {
-            auto config = configs[index].toObject();
-            auto proxy = guiConfig->get("proxy").toObject();
-            guiConfig->updateLastUsed();
-
-            bool useMixedProxy = guiConfig->get("useMixedProxy").toBool(false);
-
-            // setConfig will check the config parameters and correct them.
-            proxyManager->setConfig(config);
-            proxyManager->setProxy(proxy);
-            proxyManager->setMixedProxy(useMixedProxy);
-            proxyManager->start();
-
-            // if config parameters were corrected, save them.
-            configs[index] = config;
-            guiConfig->setConfigs(configs);
-
-            if(guiConfig->get("global").toBool()) {
-                switchToGlobal();
-            } else {
-                switchToPacMode();
-            }
+            switchToPacMode();
         }
     }
     guiConfig->set("enabled", flag);

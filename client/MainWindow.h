@@ -25,6 +25,7 @@
 #include "ProxyManager.h"
 #include "interface/SystemProxyModeManager.h"
 #include "dbusinterface/DBusStartManager.h"
+#include "GuiConfig.h"
 #include "Settings.h"
 #include "Toolbar.h"
 #include "widget/ProfileView.h"
@@ -84,10 +85,9 @@ private:
     quint64 term_usage_out;
 
     void updateMenu();
-
     void switchToPacMode();
-
     void switchToGlobal();
+    bool startss();
 
     // QWidget interface
 protected:
