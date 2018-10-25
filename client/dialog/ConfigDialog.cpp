@@ -4,217 +4,230 @@
 #include "utils.h"
 
 using QCS = Qt::CheckState;
-
-void ConfigDialog::updateListWidget() {
-    auto guiConfig = GuiConfig::instance();
-    array = guiConfig->getConfigs();
-    // cause current row -1
-    ui->listWidget->clear();
-    qDebug() << "config array" << array.size();
-    for (auto it:array) {
-        ui->listWidget->addItem(it.toObject().value("remarks").toString());
-    }
-
-    bool useMixedProxy = guiConfig->get("useMixedProxy").toBool(false);
-    QCS state = useMixedProxy ? QCS::Checked : QCS::Unchecked;
-    ui->checkBoxHttpPort->setCheckState(state);
-}
-
-void ConfigDialog::connectChanged() {
-    connect(ui->lineEditPassword, &QLineEdit::textChanged,
-            this, &ConfigDialog::modified);
-    connect(ui->lineEditRemarks, &QLineEdit::textChanged,
-            this, &ConfigDialog::modified);
-    connect(ui->lineEditServerAddr, &QLineEdit::textChanged,
-            this, &ConfigDialog::modified);
-    connect(ui->spinBoxProxyPort, SIGNAL(valueChanged(int)),
-            this, SLOT(modified()));
-    connect(ui->spinBoxServerPort, SIGNAL(valueChanged(int)),
-            this, SLOT(modified()));
-    connect(ui->spinBoxTimeout, SIGNAL(valueChanged(int)),
-            this, SLOT(modified()));
-    connect(ui->comboBoxEncryption, &QComboBox::currentTextChanged,
-            this, &ConfigDialog::modified);
-    connect(ui->checkBoxHttpPort, &QCheckBox::stateChanged,
-            this, &ConfigDialog::modified);
-}
-
-void ConfigDialog::disconnectChanged() {
-    disconnect(ui->lineEditPassword, &QLineEdit::textChanged,
-               this, &ConfigDialog::modified);
-    disconnect(ui->lineEditRemarks, &QLineEdit::textChanged,
-               this, &ConfigDialog::modified);
-    disconnect(ui->lineEditServerAddr, &QLineEdit::textChanged,
-               this, &ConfigDialog::modified);
-    disconnect(ui->spinBoxProxyPort, SIGNAL(valueChanged(int)),
-               this, SLOT(modified()));
-    disconnect(ui->spinBoxServerPort, SIGNAL(valueChanged(int)),
-               this, SLOT(modified()));
-    disconnect(ui->spinBoxTimeout, SIGNAL(valueChanged(int)),
-               this, SLOT(modified()));
-    disconnect(ui->comboBoxEncryption, &QComboBox::currentTextChanged,
-               this, &ConfigDialog::modified);
-    disconnect(ui->checkBoxHttpPort, &QCheckBox::stateChanged,
-               this, &ConfigDialog::modified);
-}
+using QMB = QMessageBox;
 
 ConfigDialog::ConfigDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::ConfigDialog) {
+    ui(new Ui::ConfigDialog),
+    m_currentPos(-1),
+    m_isConfigChanged(false)
+{
+    auto guiConfig = GuiConfig::instance();
     ui->setupUi(this);
-    isModified = false;
-    updateListWidget();
-    std::vector<std::string> methodBA = QSS::Cipher::supportedMethods();
-    std::sort(methodBA.begin(), methodBA.end());
-    QStringList methodList;
-    for (const std::string &method : methodBA) {
-        methodList.push_back(QString::fromStdString(method));
-    }
-    ui->comboBoxEncryption->addItems(methodList);
-    connectChanged();
 
-    ui->listWidget->setCurrentRow(0);
+    m_configs = guiConfig->getConfigs();
+
+    auto methodBA = QSS::Cipher::supportedMethods();
+    QStringList methodList;
+    for (auto &method : methodBA) {
+        methodList << QString::fromStdString(method);
+    }
+    qSort(methodList.begin(), methodList.end());
+    ui->comboBoxEncryption->addItems(methodList);
+
+    ui->listWidget->clear();
+    for (auto i : m_configs) {
+        ui->listWidget->addItem(i.toObject()["remarks"].toString());
+    }
+    if (0 == ui->listWidget->count()) {
+        ui->pushButtonDelete->setEnabled(false);
+    } else {
+        ui->listWidget->setCurrentRow(0);
+    }
+
+    int proxyPort = guiConfig->get("localPort").toInt(1080);
+    ui->spinBoxProxyPort->setValue(proxyPort);
+
+    bool useMixedProxy = guiConfig->get("useMixedProxy").toBool(false);
+    QCS state = useMixedProxy ? QCS::Checked : QCS::Unchecked;
+    ui->checkBoxMixedPort->setCheckState(state);
+
     Dtk::Widget::moveToCenter(this);
 }
 
 ConfigDialog::~ConfigDialog() {
+    ui->listWidget->clear();
     delete ui;
 }
 
+bool ConfigDialog::isConfigChanged() {
+    return m_isConfigChanged;
+}
+
+void ConfigDialog::stashConfig(int index) {
+    auto config = m_configs[index].toObject();
+    // TODO validate them
+    config["password"] = ui->lineEditPassword->text();
+    config["remarks"] = ui->lineEditRemarks->text();
+    config["server"] = ui->lineEditServerAddr->text();
+    config["server_port"] = ui->spinBoxServerPort->value();
+    config["local_port"] = ui->spinBoxProxyPort->value();
+    config["timeout"] = ui->spinBoxTimeout->value();
+    config["method"] = ui->comboBoxEncryption->currentText();
+
+    m_configs.replace(index, config);
+}
+
+void ConfigDialog::showConfig(int index) {
+    auto config = m_configs[index].toObject();
+    ui->lineEditPassword->setText(config["password"].toString());
+    ui->lineEditRemarks->setText(config["remarks"].toString());
+    ui->lineEditServerAddr->setText(config["server"].toString());
+    ui->spinBoxServerPort->setValue(config["server_port"].toInt());
+    ui->spinBoxTimeout->setValue(config["timeout"].toInt());
+    ui->comboBoxEncryption->setCurrentText(config["method"].toString());
+}
+
 void ConfigDialog::save() {
-    lastConfig.insert("password", ui->lineEditPassword->text());
-    lastConfig.insert("remarks", ui->lineEditRemarks->text());
-    lastConfig.insert("server", ui->lineEditServerAddr->text());
-    lastConfig.insert("server_port", ui->spinBoxServerPort->value());
-    lastConfig.insert("local_port", ui->spinBoxProxyPort->value());
-    lastConfig.insert("timeout", ui->spinBoxTimeout->value());
-    lastConfig.insert("method", ui->comboBoxEncryption->currentText());
-    array.replace(lastPos, lastConfig);
-    GuiConfig::instance()->setConfigs(array);
+    bool useMixedProxy = ui->checkBoxMixedPort->checkState() == QCS::Checked;
+    int localPort = ui->spinBoxProxyPort->value();
 
-    bool useMixedProxy = ui->checkBoxHttpPort->checkState() == QCS::Checked;
-    GuiConfig::instance()->set("useMixedProxy", useMixedProxy);
-}
+    // get origin configuration
+    auto _configs = GuiConfig::instance()->getConfigs();
+    auto _useMixedProxy = GuiConfig::instance()->get("useMixedProxy").toBool();
+    auto _localPort = GuiConfig::instance()->get("localPort").toInt();
 
-void ConfigDialog::modified() {
-    isModified = true;
-    lastConfig.insert("update_time", Utils::getTimestamp());
-}
+    // check for changes
+    bool configsChanged = (m_configs == _configs);
+    bool proxyChanged = useMixedProxy == _useMixedProxy;
+    bool portChanged = localPort == _localPort;
 
-void ConfigDialog::checkModify() {
-    if (isModified) {
-        auto ret = QMessageBox::information(nullptr,
-                                            "warning",
-                                            "Your config is modified. "
-                                            "Do you want to save it?",
-                                            QMessageBox::Yes | QMessageBox::No);
-        if (ret == QMessageBox::Yes) {
-            save();
-            isModified = false;
-            // updateListWidget();
+    m_isConfigChanged = configsChanged || proxyChanged || portChanged;
+    if (m_isConfigChanged) {
+        auto ret = QMB::information(this,
+                                    tr("Save"),
+                                    tr("Configuration changed. Save it?"),
+                                    QMB::Yes | QMB::No);
+        if (QMB::Yes == ret) {
+            GuiConfig::instance()->setConfigs(m_configs);
+            GuiConfig::instance()->set("useMixedProxy", useMixedProxy);
+            GuiConfig::instance()->set("localPort", localPort);
         }
     }
 }
 
 void ConfigDialog::on_listWidget_currentRowChanged(int currentRow) {
     if (currentRow < 0) {
-        qDebug() << "cur row" << currentRow << " clear listwidget";
+        // list is cleared.
         return;
     }
-    checkModify();
-    auto config = array.at(currentRow).toObject();
-    ui->lineEditPassword->setText(config.value("password").toString());
-    ui->lineEditRemarks->setText(config.value("remarks").toString());
-    ui->lineEditServerAddr->setText(config.value("server").toString());
-    ui->spinBoxServerPort->setValue(config.value("server_port").toInt());
-    ui->spinBoxProxyPort->setValue(config.value("local_port").toInt());
-    ui->spinBoxTimeout->setValue(config.value("timeout").toInt());
-    ui->comboBoxEncryption->setCurrentText(config.value("method").toString());
-    lastConfig = config;
-    lastPos = currentRow;
-    isModified = false;
-    qDebug() << "cur pos" << lastPos;
+    if (-1 != m_currentPos) {
+        // don't stash the config if m_currentPos is set to -1.
+        stashConfig(m_currentPos);
+    }
+    showConfig(currentRow);
+    m_currentPos = currentRow;
 }
 
 void ConfigDialog::on_pushButtonAdd_clicked() {
-    checkModify();
-    QJsonObject o = lastConfig;
-    auto t = Utils::getTimestamp();
-    o.insert("create_time", t);
-    o.insert("update_time", t);
-    o.insert("password", "");
-    o.insert("server", "");
-    o.insert("remarks", "unname");
-    GuiConfig::calId(o);
-    array.append(o);
-    save();
-    updateListWidget();
-    ui->listWidget->setCurrentRow(array.size() - 1);
+    QJsonObject config;
+    config.insert("remarks", "unnamed");
+    config.insert("server", "");
+    config.insert("server_port", 8388);
+    config.insert("password", "");
+    config.insert("local_port", 1080);
+    config.insert("timeout", 6);
+    config.insert("method", "");
+    // GuiConfig::calId(config);
+    int addPos = m_configs.size();
+    m_configs.append(config);
+    // push back this config.
+    ui->listWidget->insertItem(addPos, config["remarks"].toString());
+    ui->listWidget->setCurrentRow(addPos);
+    if (!ui->pushButtonDelete->isEnabled()) {
+      ui->pushButtonDelete->setEnabled(true);
+    }
 }
 
 void ConfigDialog::on_pushButtonDelete_clicked() {
-    int ret = QMessageBox::warning(nullptr,
-                                   "warning", "Are you sure?",
-                                   QMessageBox::Yes | QMessageBox::No);
-    if (ret == QMessageBox::No) {
+    int ret = QMB::warning(this,
+                           tr("Delete"),
+                           tr("Are you sure to delete this?"),
+                           QMB::Yes | QMB::No);
+    if (ret == QMB::No) {
         return;
     }
-    array.removeAt(lastPos);
-    save();
-    if (array.isEmpty()) {
+
+    int currentPos = m_currentPos;
+    delete ui->listWidget->takeItem(currentPos);
+    // don't stash the config
+    m_currentPos = -1;
+    m_configs.removeAt(currentPos);
+
+    if (0 == ui->listWidget->count()) {
         ui->lineEditPassword->clear();
         ui->lineEditRemarks->clear();
         ui->lineEditServerAddr->clear();
-        updateListWidget();
-    } else if (array.size() > lastPos) {
-        updateListWidget();
-        ui->listWidget->setCurrentRow(lastPos);
+        ui->spinBoxServerPort->setValue(8388);
+        // could not delete any more.
+        ui->pushButtonDelete->setEnabled(false);
     } else {
-        updateListWidget();
-        ui->listWidget->setCurrentRow(lastPos - 1);
+      currentPos = currentPos < m_configs.size() ? currentPos : currentPos - 1;
+      // this action won't trigger on_currentRowChanged()
+      ui->listWidget->setCurrentRow(currentPos);
+      m_currentPos = currentPos;
     }
 }
 
 void ConfigDialog::on_pushButtonDuplicate_clicked() {
-    checkModify();
-    QJsonObject o = lastConfig;
-    auto t = Utils::getTimestamp();
-    o.insert("create_time", t);
-    o.insert("update_time", t);
-    GuiConfig::calId(o);
-    array.append(o);
-    save();
-    updateListWidget();
-    ui->listWidget->setCurrentRow(array.size() - 1);
+    QJsonObject config = m_configs[m_currentPos].toObject();
+    int addPos = m_configs.size();
+    m_configs.append(config);
+    // push back this config.
+    ui->listWidget->insertItem(addPos, config["remarks"].toString());
+    ui->listWidget->setCurrentRow(addPos);
 }
 
 void ConfigDialog::on_pushButtonMoveUp_clicked() {
-    if (lastPos == 0) {
+    if (m_currentPos == 0) {
         return;
     }
-    auto o1 = array.at(lastPos).toObject();
-    auto o2 = array.at(lastPos - 1).toObject();
-    array.replace(lastPos, o2);
-    array.replace(lastPos - 1, o1);
-    GuiConfig::instance()->setConfigs(array);
-    updateListWidget();
-    ui->listWidget->setCurrentRow(lastPos - 1);
+    int currentPos = m_currentPos;
+
+    m_currentPos = -1;
+    auto tmp = ui->listWidget->takeItem(currentPos - 1);
+    // swap the two configs
+    auto _config = m_configs[currentPos];
+    m_configs[currentPos] = m_configs[currentPos - 1].toObject();
+    m_configs[currentPos - 1] = _config.toObject();
+
+    m_currentPos = -1;
+    ui->listWidget->insertItem(currentPos, tmp);
+
+    ui->listWidget->setCurrentRow(currentPos - 1);
+    m_currentPos = currentPos - 1;
 }
 
 void ConfigDialog::on_pushButtonMoveDown_clicked() {
-    if (lastPos == array.size() - 1) {
+    if (m_currentPos == m_configs.size() - 1) {
         return;
     }
-    auto o1 = array.at(lastPos).toObject();
-    auto o2 = array.at(lastPos + 1).toObject();
-    array.replace(lastPos, o2);
-    array.replace(lastPos + 1, o1);
-    GuiConfig::instance()->setConfigs(array);
-    updateListWidget();
-    ui->listWidget->setCurrentRow(lastPos + 1);
+    int currentPos = m_currentPos;
+
+    m_currentPos = -1;
+    auto tmp = ui->listWidget->takeItem(currentPos + 1);
+    // swap the two configs
+    auto _config = m_configs[currentPos];
+    m_configs[currentPos] = m_configs[currentPos + 1].toObject();
+    m_configs[currentPos + 1] = _config.toObject();
+
+    m_currentPos = -1;
+    ui->listWidget->insertItem(currentPos, tmp);
+
+    ui->listWidget->setCurrentRow(currentPos + 1);
+    m_currentPos = currentPos + 1;
+}
+
+void ConfigDialog::on_lineEditRemarks_textEdited(const QString &edited) {
+    auto currentItem = ui->listWidget->item(m_currentPos);
+    if (edited.isEmpty()) {
+        currentItem->setData(0, "unnamed");
+    } else if (currentItem->text() != edited) {
+        currentItem->setData(0, edited);
+    }
 }
 
 void ConfigDialog::on_pushButtonOK_clicked() {
-    checkModify();
+    save();
     close();
 }

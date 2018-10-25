@@ -213,7 +213,7 @@
      </widget>
     </item>
     <item row="1" column="0">
-     <widget class="QCheckBox" name="checkBoxHttpPort">
+     <widget class="QCheckBox" name="checkBoxMixedPort">
       <property name="text">
        <string>Use Mixed Port</string>
       </property>
@@ -239,7 +239,7 @@
   <tabstop>pushButtonMoveUp</tabstop>
   <tabstop>pushButtonMoveDown</tabstop>
   <tabstop>spinBoxProxyPort</tabstop>
-  <tabstop>checkBoxHttpPort</tabstop>
+  <tabstop>checkBoxMixedPort</tabstop>
   <tabstop>pushButtonOK</tabstop>
   <tabstop>pushButtonCancel</tabstop>
  </tabstops>
