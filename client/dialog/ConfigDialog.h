@@ -31,12 +31,10 @@ class ConfigDialog : public QDialog {
     Q_OBJECT
 
 public:
-    explicit ConfigDialog(QWidget *parent = 0);
-
+    explicit ConfigDialog(QWidget *parent = nullptr);
     ~ConfigDialog();
+    bool isConfigChanged();
 
-private slots:
-    void on_listWidget_currentRowChanged(int currentRow);
 
 private:
     Ui::ConfigDialog *ui;
@@ -47,7 +45,6 @@ private:
     void save();
     void stashConfig(int index);
     void showConfig(int index);
-    bool isConfigChanged();
 
 private slots:
     void on_pushButtonAdd_clicked();
@@ -57,6 +54,7 @@ private slots:
     void on_pushButtonMoveDown_clicked();
     void on_pushButtonOK_clicked();
     void on_lineEditRemarks_textEdited(const QString &arg1);
+    void on_listWidget_currentRowChanged(int currentRow);
 };
 
 #endif // CONFIGDIALOG_H
