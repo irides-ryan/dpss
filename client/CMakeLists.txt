@@ -55,7 +55,7 @@ set(CMAKE_INSTALL_PREFIX /usr)
 
 # Install icons
 foreach (ICON_SIZE 16 24 32 48 64 96 128 256)
-    install(FILES Resources/ssw${ICON_SIZE}.svg
+    install(FILES icons/ssw${ICON_SIZE}.svg
             RENAME dpss.svg
             DESTINATION share/icons/hicolor/${ICON_SIZE}x${ICON_SIZE}/apps)
 endforeach ()
