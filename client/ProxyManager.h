@@ -32,7 +32,7 @@ public:
 
     void setProxy(const QJsonObject &proxy);
 
-    void setMixedProxy(bool useMixedProxy);
+    void setMixedProxy(bool useMixedProxy, uint16_t port);
 signals:
 
     void runningStateChanged(bool);

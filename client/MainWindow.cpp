@@ -139,9 +139,10 @@ bool MainWindow::startss() {
 
     auto config = guiConfig->getConfigs()[index].toObject();
     auto useMixedProxy = guiConfig->get("useMixedProxy").toBool();
+    auto localPort = guiConfig->get("localPort").toInt(1080);
     auto proxy = guiConfig->get("proxy").toObject();
     proxyManager->setConfig(config);
-    proxyManager->setMixedProxy(useMixedProxy);
+    proxyManager->setMixedProxy(useMixedProxy, localPort);
     proxyManager->setProxy(proxy);
     bool succeed = proxyManager->start();
 

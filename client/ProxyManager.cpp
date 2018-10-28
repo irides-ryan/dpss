@@ -19,8 +19,9 @@ void ProxyManager::setProxy(const QJsonObject &proxy) {
     }
 }
 
-void ProxyManager::setMixedProxy(bool useMixedProxy) {
+void ProxyManager::setMixedProxy(bool useMixedProxy, uint16_t port) {
     m_profile.setMixedProxy(useMixedProxy);
+    m_profile.setLocalPort(port);
 }
 
 bool ProxyManager::start() {
@@ -94,13 +95,13 @@ void ProxyManager::getProfile(QJsonObject &config, QSS::Profile &profile) {
         config.insert("timeout", timeout);
     }
     profile.setTimeout(timeout);
-    int local_port = config["local_port"].toInt();
-    if (local_port == 0) {
-        Utils::warning("local_port is 0. we will change the value to 1080.");
-        local_port = 1080;
-        config.insert("local_port", local_port);
-    }
-    profile.setLocalPort(local_port);
+//    int local_port = config["local_port"].toInt();
+//    if (local_port == 0) {
+//        Utils::warning("local_port is 0. we will change the value to 1080.");
+//        local_port = 1080;
+//        config.insert("local_port", local_port);
+//    }
+//    profile.setLocalPort(local_port);
     QString local_addr = config["local_address"].toString();
     if (local_addr.isEmpty()) {
         Utils::warning("local address is empty. we will change the value to 127.0.0.1.");
