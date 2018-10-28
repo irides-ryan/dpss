@@ -359,7 +359,7 @@ void MainWindow::on_actionGlobal_triggered(bool checked) {
 
 void MainWindow::on_actionStart_on_Boot_triggered(bool checked) {
     // 如果使用flatpak，这里可能有问题
-    QString url = "/usr/share/applications/shadowsocks-client.desktop";
+    QString url = "/usr/share/applications/dpss.desktop";
     if (!checked) {
         QDBusPendingReply<bool> reply = startManagerInter.RemoveAutostart(url);
         reply.waitForFinished();
@@ -368,7 +368,6 @@ void MainWindow::on_actionStart_on_Boot_triggered(bool checked) {
             qDebug() << "remove from startup:" << ret;
         } else {
             qCritical() << reply.error().name() << reply.error().message();
-            Utils::critical("change auto boot error");
         }
     } else {
         QDBusPendingReply<bool> reply = startManagerInter.AddAutostart(url);
@@ -378,11 +377,9 @@ void MainWindow::on_actionStart_on_Boot_triggered(bool checked) {
             qDebug() << "add to startup:" << ret;
         } else {
             qCritical() << reply.error().name() << reply.error().message();
-            Utils::critical("change auto boot error");
         }
     }
     GuiConfig::instance()->set("autostart", checked);
-
 }
 
 void MainWindow::on_actionQuit_triggered() {
