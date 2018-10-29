@@ -79,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow() {
     proxyManager->stop();
-    systemProxyModeManager->switchToNone();
+    delete systemProxyModeManager;
     delete ui;
 }
 

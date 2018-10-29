@@ -31,15 +31,18 @@ class DDEProxyModeManager : public SystemProxyModeManager {
     Q_OBJECT
 public:
     explicit DDEProxyModeManager(QObject *parent = nullptr);
+    ~DDEProxyModeManager() override;
 
     void switchToNone() override;
-
     void switchToAuto(QString pacURI) override;
-
-    void switchToManual(QString localAddress, int port) override;
+    void switchToManual(QString localAddress,
+                        int localPort,
+                        QString type = QString()) override;
 
 private:
     NetworkInter networkInter;
+    // store the proxy settings when start and restore it when exit.
+    QString m_storedProxy;
 
     void setProxyMethod(QString proxyMethod);
 };
