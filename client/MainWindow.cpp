@@ -31,14 +31,11 @@ MainWindow::MainWindow(QWidget *parent) :
     proxyManager = new ProxyManager(this);
     const auto &guiConfig = GuiConfig::instance();
     systemProxyModeManager = new DDEProxyModeManager(this);
+
     if (guiConfig->get("enabled").toBool()) {
-        on_actionEnable_System_Proxy_triggered(true);
-        if (guiConfig->get("global").toBool()) {
-            switchToGlobal();
-        } else {
-            switchToPacMode();
-        }
+      emit ui->actionEnable_System_Proxy->triggered(true);
     }
+
     in = 0;
     out = 0;
     ins.clear();
