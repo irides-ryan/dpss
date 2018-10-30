@@ -38,8 +38,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     in = 0;
     out = 0;
-    ins.clear();
-    outs.clear();
 
     auto timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::updateTrayIcon);
@@ -69,27 +67,113 @@ MainWindow::MainWindow(QWidget *parent) :
         GuiConfig::instance()->addTotalUsage(n);
     });
 
-    updateTrayIcon();
-    on_actionStart_on_Boot_triggered(guiConfig->get("autostart").toBool(true));
+    auto autostart = guiConfig->get("autostart").toBool(true);
+    emit ui->actionStart_on_Boot->triggered(autostart);
+
     updateMenu();
 }
 
 MainWindow::~MainWindow() {
     proxyManager->stop();
+    delete proxyManager;
     delete systemProxyModeManager;
+    delete systemTrayIcon;
     delete ui;
+}
+
+void MainWindow::updateMenu() {
+    auto guiConfig = GuiConfig::instance();
+    QList<QAction *> actionList;
+
+    auto enabled = guiConfig->get("enabled").toBool();
+    ui->actionEnable_System_Proxy->setChecked(enabled);
+    ui->menuMode->setEnabled(true);
+
+    auto global = guiConfig->get("global").toBool();
+    ui->actionGlobal->setChecked(global);
+    ui->actionPAC->setChecked(!global);
+
+    auto useOnlinePac = guiConfig->get("useOnlinePac").toBool();
+    ui->actionOnline_PAC->setChecked(useOnlinePac);
+    ui->actionLocal_PAC->setChecked(!useOnlinePac);
+
+    // protect local pac file
+    auto securelocalpac = guiConfig->get("securelocalpac").toBool();
+    ui->actionSecure_Local_PAC->setChecked(securelocalpac);
+
+    auto shareOverLan = guiConfig->get("shareOverLan").toBool();
+    ui->actionAllow_Clients_from_LAN->setChecked(shareOverLan);
+
+    auto isVerboseLogging = guiConfig->get("isVerboseLogging").toBool();
+    ui->actionVerbose_Logging->setChecked(isVerboseLogging);
+
+    auto autoCheckUpdate = guiConfig->get("autoCheckUpdate").toBool();
+    ui->actionCheck_for_Updates_at_Startup->setChecked(autoCheckUpdate);
+
+    auto checkPreRelease = guiConfig->get("checkPreRelease").toBool();
+    ui->actionCheck_Pre_release_Version->setChecked(checkPreRelease);
+
+    auto autoStart = guiConfig->get("autoStart").toBool();
+    ui->actionStart_on_Boot->setChecked(autoStart);
+
+    ui->menuServers->clear();
+    actionList << ui->actionLoad_Balance
+               << ui->actionHigh_Availability
+               << ui->actionChoose_by_statistics;
+    ui->menuServers->addActions(actionList);
+    actionList.clear();
+
+    ui->menuServers->addSeparator();
+
+    auto configs = guiConfig->getConfigs();
+    for (int i = 0; i < configs.size(); i++) {
+        auto it = configs.at(i);
+        QString name = it.toObject().value("remarks").toString();
+        auto action = ui->menuServers->addAction(name, [=]() {
+            GuiConfig::instance()->set("index", i);
+            on_actionEnable_System_Proxy_triggered(true);
+        });
+        action->setCheckable(true);
+        if (guiConfig->get("enabled").toBool()
+            && guiConfig->get("index").toInt() == i) {
+            action->setChecked(true);
+        }
+    }
+    actionList.clear();
+
+    ui->menuServers->addSeparator();
+
+    actionList << ui->actionEdit_Servers
+               << ui->actionStatistics_Config
+               << ui->actionImport_from_gui_config_json
+               << ui->actionExport_as_gui_config_json;
+    ui->menuServers->addActions(actionList);
+    actionList.clear();
+
+    ui->menuServers->addSeparator();
+
+    actionList << ui->actionShare_Server_Config
+               << ui->actionScan_QRCode_from_Screen
+               << ui->actionImport_URL_from_Clipboard;
+    ui->menuServers->addActions(actionList);
+    actionList.clear();
+
+    ui->menuServers->addSeparator();
+
+    ui->menuHelp->menuAction()->setVisible(true);
+    ui->menuPAC->menuAction()->setVisible(false);
 }
 
 void MainWindow::switchToPacMode() {
     auto guiConfig = GuiConfig::instance();
     QString online_pac_uri = "http://file.lolimay.cn/autoproxy.pac";
-    QString pacURI = "";
+    QString pacUri = "";
     if (guiConfig->get("useOnlinePac").toBool(true)) {
-        pacURI = guiConfig->get("pacUrl").toString();
-        if (pacURI.isEmpty()) {
+        pacUri = guiConfig->get("pacUrl").toString();
+        if (pacUri.isEmpty()) {
             Utils::warning("online pac uri is empty. we will use default uri.");
-            pacURI = online_pac_uri;
-            guiConfig->set("pacUrl", pacURI);
+            pacUri = online_pac_uri;
+            guiConfig->set("pacUrl", pacUri);
         }
     } else {
         QString pac_file = QDir(Utils::configPath()).filePath("autoproxy.pac");
@@ -97,14 +181,14 @@ void MainWindow::switchToPacMode() {
         if (!file.exists()) {
             Utils::warning("local pac is not exist. we will use on pac file. "
                            "you can change it");
-            pacURI = online_pac_uri;
-            guiConfig->set("pacUrl", pacURI);
+            pacUri = online_pac_uri;
+            guiConfig->set("pacUrl", pacUri);
             guiConfig->set("useOnlinePac", true);
         } else {
-            pacURI = "file://" + pac_file;
+            pacUri = "file://" + pac_file;
         }
     }
-    systemProxyModeManager->switchToAuto(pacURI);
+    systemProxyModeManager->switchToAuto(pacUri);
 }
 
 void MainWindow::switchToGlobal() {
@@ -128,7 +212,7 @@ bool MainWindow::startss() {
     auto guiConfig = GuiConfig::instance();
     auto configs = guiConfig->getConfigs();
     auto index = guiConfig->get("index").toInt();
-    if (0 == configs.size()) {
+    if (configs.isEmpty()) {
         return false;
     } else if (index > configs.size() - 1) {
         index = configs.size() - 1;
@@ -150,14 +234,11 @@ bool MainWindow::startss() {
     return succeed;
 }
 
-void MainWindow::contextMenuEvent(QContextMenuEvent *)
-{
-    qDebug()<<"right click";
+void MainWindow::contextMenuEvent(QContextMenuEvent *) {
+    qDebug() << "right click";
 }
 
 void MainWindow::updateTrayIcon() {
-    ins.append(in);
-    outs.append(out);
     QString icon = "ssw";
     if (in > 0) {
         icon.append("_in");
@@ -193,7 +274,6 @@ void MainWindow::on_actionEdit_Online_PAC_URL_triggered() {
 }
 
 void MainWindow::on_actionForward_Proxy_triggered() {
-    auto config = GuiConfig::instance();
     ProxyDialog dialog(this);
     dialog.exec();
     if (dialog.result() == QDialog::Accepted) {
@@ -209,99 +289,6 @@ void MainWindow::on_actionShow_Logs_triggered() {
     w.show();
 }
 
-void MainWindow::updateMenu() {
-    auto guiConfig = GuiConfig::instance();
-    //    qDebug() << guiConfig->getConfigs();
-    if (guiConfig->get("enabled").toBool()) {
-        ui->actionEnable_System_Proxy->setChecked(true);
-        ui->menuMode->setEnabled(true);
-    } else {
-        ui->actionEnable_System_Proxy->setChecked(false);
-        ui->menuMode->setEnabled(false);
-    }
-    if (guiConfig->get("global").toBool()) {
-        ui->actionGlobal->setChecked(true);
-        ui->actionPAC->setChecked(false);
-    } else {
-        ui->actionGlobal->setChecked(false);
-        ui->actionPAC->setChecked(true);
-    }
-    if (guiConfig->get("useOnlinePac").toBool()) {
-        ui->actionOnline_PAC->setChecked(true);
-        ui->actionLocal_PAC->setChecked(false);
-    } else {
-        ui->actionOnline_PAC->setChecked(false);
-        ui->actionLocal_PAC->setChecked(true);
-    }
-    if (guiConfig->get("secureLocalPac").toBool()) {
-        ui->actionSecure_Local_PAC->setChecked(true);
-    } else {
-        ui->actionSecure_Local_PAC->setChecked(false);
-    }
-    if (guiConfig->get("shareOverLan").toBool()) {
-        ui->actionAllow_Clients_from_LAN->setChecked(true);
-    } else {
-        ui->actionAllow_Clients_from_LAN->setChecked(false);
-    }
-    if (guiConfig->get("isVerboseLogging").toBool()) {
-        ui->actionVerbose_Logging->setChecked(true);
-    } else {
-        ui->actionVerbose_Logging->setChecked(false);
-    }
-    if (guiConfig->get("autoCheckUpdate").toBool()) {
-        ui->actionCheck_for_Updates_at_Startup->setChecked(true);
-    } else {
-        ui->actionCheck_for_Updates_at_Startup->setChecked(false);
-    }
-    if (guiConfig->get("checkPreRelease").toBool()) {
-        ui->actionCheck_Pre_release_Version->setChecked(true);
-    } else {
-        ui->actionCheck_Pre_release_Version->setChecked(false);
-    }
-    if(guiConfig->get("autostart").toBool()){
-        ui->actionStart_on_Boot->setChecked(true);
-    }else{
-        ui->actionStart_on_Boot->setChecked(false);
-    }
-    auto configs = guiConfig->getConfigs();
-    ui->menuServers->clear();
-    QList<QAction *> action_list;
-    action_list << ui->actionLoad_Balance
-                << ui->actionHigh_Availability
-                << ui->actionChoose_by_statistics;
-    ui->menuServers->addActions(action_list);
-    ui->menuServers->addSeparator();
-    action_list.clear();
-    for (int i = 0; i < configs.size(); i++) {
-        auto it = configs.at(i);
-        QString name = it.toObject().value("remarks").toString();
-        auto action = ui->menuServers->addAction(name, [=]() {
-            GuiConfig::instance()->set("index", i);
-            on_actionEnable_System_Proxy_triggered(true);
-        });
-        action->setCheckable(true);
-        if (guiConfig->get("enabled").toBool()
-            && guiConfig->get("index").toInt() == i) {
-            action->setChecked(true);
-        }
-    }
-    ui->menuServers->addSeparator();
-    action_list << ui->actionEdit_Servers
-                << ui->actionStatistics_Config
-                << ui->actionImport_from_gui_config_json
-                << ui->actionExport_as_gui_config_json;
-    ui->menuServers->addActions(action_list);
-    ui->menuServers->addSeparator();
-    ui->menuServers->addSeparator();
-    action_list << ui->actionShare_Server_Config
-                << ui->actionScan_QRCode_from_Screen
-                << ui->actionImport_URL_from_Clipboard;
-    ui->menuServers->addActions(action_list);
-    ui->menuServers->addSeparator();
-
-    ui->menuHelp->menuAction()->setVisible(false);
-    ui->menuPAC->menuAction()->setVisible(false);
-}
 
 void MainWindow::on_actionImport_from_gui_config_json_triggered() {
     QString filename = QFileDialog::getOpenFileName(
@@ -335,7 +322,7 @@ void MainWindow::on_actionEnable_System_Proxy_triggered(bool flag) {
 }
 
 void MainWindow::on_actionPAC_triggered(bool checked) {
-    qDebug() << "pac" << checked;
+    qDebug() << "on_pac " << checked;
     auto guiConfig = GuiConfig::instance();
     if (guiConfig->get("global").toBool() == checked) {
         guiConfig->set("global", !checked);
@@ -345,7 +332,7 @@ void MainWindow::on_actionPAC_triggered(bool checked) {
 }
 
 void MainWindow::on_actionGlobal_triggered(bool checked) {
-    qDebug() << "global" << checked;
+    qDebug() << "on_global " << checked;
     auto guiConfig = GuiConfig::instance();
     if (guiConfig->get("global").toBool() != checked) {
         guiConfig->set("global", checked);
@@ -384,72 +371,61 @@ void MainWindow::on_actionQuit_triggered() {
 }
 
 bool MainWindow::eventFilter(QObject *, QEvent *event) {
-    //    qDebug()<<event->type();
     if (event->type() == QEvent::WindowStateChange) {
-        //        adjustStatusBarWidth();
     } else if (event->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
         if (keyEvent->key() == Qt::Key_F) {
             if (keyEvent->modifiers() == Qt::ControlModifier) {
-                toolbar->focusInput();
             }
         }
     } else if (event->type() == QEvent::Close) {
     }
-
     return false;
 }
 
 void MainWindow::on_actionDisconnect_triggered() {
-    on_actionEnable_System_Proxy_triggered(false);
+    emit ui->actionEnable_System_Proxy->triggered(false);
 }
 
-void MainWindow::on_actionScan_QRCode_from_Screen_triggered()
-{
+void MainWindow::on_actionScan_QRCode_from_Screen_triggered() {
     QString uri = QRCodeCapturer::scanEntireScreen();
     if (uri.isNull()) {
         QMessageBox::critical(
-                    nullptr,
-                    tr("QR Code Not Found"),
-                    tr("Can't find any QR code image that contains "
-                       "valid URI on your screen(s)."));
+            this,
+            tr("QR Code Not Found"),
+            tr("Can't find any QR code image that contains valid URI "
+               "on your screen(s)."));
     } else {
-        qDebug() << "QR scan: get uri:" << uri;
+        qDebug() << "QR scan: get uri: " << uri;
         if(uri.startsWith("ss://")){
             if(SSValidator::validate(uri)){
                 GuiConfig::instance()->addConfig(uri);
                 updateMenu();
-                on_actionEdit_Servers_triggered();
+                emit ui->actionEdit_Servers->triggered();
             }else{
-                Utils::info("URI is invalid");
+                Utils::info(tr("Uri from screen is invalid"));
             }
         }
     }
 }
 
-void MainWindow::on_actionImport_URL_from_Clipboard_triggered()
-{
+void MainWindow::on_actionImport_URL_from_Clipboard_triggered() {
     QString uri = QApplication::clipboard()->text();
-    if(SSValidator::validate(uri)){
+    if(SSValidator::validate(uri)) {
         GuiConfig::instance()->addConfig(uri);
         updateMenu();
-        on_actionEdit_Servers_triggered();
+        emit ui->actionEdit_Servers->triggered();
     }else{
-        Utils::info("URI is invalid");
+        Utils::info(tr("Uri from clipboard is invalid."));
     }
 }
 
-void MainWindow::on_actionShare_Server_Config_triggered()
-{
-    // ? 这里肯定是有内存泄露的，但是我只要一析构，程序就崩溃了 ?
-    // TODO Need More Info: the crush does not recur.
-    // 生成分享的二维码
+void MainWindow::on_actionShare_Server_Config_triggered() {
     ShareDialog dialog(this);
     dialog.exec();
 }
 
-void MainWindow::on_actionExport_as_gui_config_json_triggered()
-{
+void MainWindow::on_actionExport_as_gui_config_json_triggered() {
     using QSP = QStandardPaths;
     QString filename = QFileDialog::getExistingDirectory(
           nullptr,

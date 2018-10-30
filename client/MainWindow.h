@@ -44,6 +44,27 @@ public:
     ~MainWindow() override;
     bool eventFilter(QObject *, QEvent *) override ;
 
+private:
+    Ui::MainWindow *ui;
+    QSystemTrayIcon *systemTrayIcon;
+
+    ProxyManager *proxyManager;
+    SystemProxyModeManager *systemProxyModeManager;
+    StartManagerInter startManagerInter;
+
+    quint64 in;
+    quint64 out;
+    quint64 term_usage_in;
+    quint64 term_usage_out;
+
+    void updateMenu();
+    void switchToPacMode();
+    void switchToGlobal();
+    bool startss();
+
+protected:
+    void contextMenuEvent(QContextMenuEvent *event) override;
+
 private slots:
     void on_actionEdit_Servers_triggered();
     void on_actionEdit_Online_PAC_URL_triggered();
@@ -61,37 +82,6 @@ private slots:
     void on_actionImport_URL_from_Clipboard_triggered();
     void on_actionShare_Server_Config_triggered();
     void on_actionExport_as_gui_config_json_triggered();
-
-private:
-    Ui::MainWindow *ui;
-    QSystemTrayIcon *systemTrayIcon;
-    Toolbar *toolbar;
-    // I can't use both DSimpleView and QSystemTrayIcon.
-    // So I create a container
-    DMainWindow *w;
-    ProfileView *config_view;
-    QMenu *rightMenu;
-    QMenu *rightMenuBlank;
-    QMenu *menuAdd;
-    ProxyManager *proxyManager;
-    SystemProxyModeManager *systemProxyModeManager;
-    StartManagerInter startManagerInter;
-    Settings *settings;
-    QList<quint64> ins;
-    QList<quint64> outs;
-    quint64 in;
-    quint64 out;
-    quint64 term_usage_in;
-    quint64 term_usage_out;
-
-    void updateMenu();
-    void switchToPacMode();
-    void switchToGlobal();
-    bool startss();
-
-    // QWidget interface
-protected:
-    void contextMenuEvent(QContextMenuEvent *event) override;
 };
 
 #endif // MAINWINDOW_H
