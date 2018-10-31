@@ -73,22 +73,10 @@ void GuiConfig::saveToDisk(QString path) {
         QJsonDocument d;
         d.setObject(guiConfig);
         file.write(d.toJson());
-        // qDebug().noquote().nospace() << d.toJson();
         file.flush();
         file.close();
     }
 
-}
-
-QJsonObject GuiConfig::getConfigById(QString id) {
-    const auto &array = guiConfig["configs"].toArray();
-    guiConfig.insert("configs", QJsonArray());
-    for (auto it:array) {
-        if (it.toObject()["id"] == id) {
-            return it.toObject();
-        }
-    }
-    return QJsonObject();
 }
 
 QJsonArray GuiConfig::getConfigs() {
@@ -139,15 +127,6 @@ void GuiConfig::addTotalUsage(int n) {
     auto o = array.at(index).toObject();
     auto m = o.value("total_usage").toInt();
     o.insert("total_usage", m + n);
-    array.replace(index, o);
-    setConfigs(array);
-}
-
-void GuiConfig::updateLastUsed() {
-    auto index = guiConfig.value("index").toInt();
-    auto array = guiConfig.value("configs").toArray();
-    auto o = array.at(index).toObject();
-    o.insert("last_used", QDateTime::currentDateTime().toString());
     array.replace(index, o);
     setConfigs(array);
 }
@@ -249,23 +228,6 @@ void GuiConfig::calId(QJsonObject &j) {
     j.insert("id", QString(id));
 }
 
-QJsonObject GuiConfig::getConfigFromURI(QString )
-{
-    return createConfig();
-}
-
-int GuiConfig::getIndexById(QString id) {
-
-    auto array = guiConfig["configs"].toArray();
-    for (int i = 0; i < array.size(); i++) {
-        QString t_id = array.at(i).toObject().value("id").toString();
-        if (t_id == id) {
-            return i;
-        }
-    }
-    return -1;
-}
-
 QJsonObject GuiConfig::createConfig() {
     QJsonObject o;
     calId(o);
@@ -315,4 +277,3 @@ QString GuiConfig::getConfigURI(int index)
     QString uri = QString("ss://%1#%2").arg(QString(s.toLocal8Bit().toBase64())).arg(name);
     return uri;
 }
-

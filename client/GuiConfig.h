@@ -36,10 +36,6 @@ public:
 
     void saveToDisk(QString path);
 
-    QJsonObject getConfigById(QString id);
-
-    int getIndexById(QString id);
-
     QJsonArray getConfigs();
 
     void setConfigs(QJsonArray array);
@@ -54,10 +50,7 @@ public:
 
     void addTotalUsage(int n);
 
-    void updateLastUsed();
-
     static void calId(QJsonObject &j);
-    static QJsonObject getConfigFromURI(QString uri);
     static QJsonObject createConfig();
     /**
      * @brief addConfig
@@ -74,8 +67,8 @@ private:
     bool existConfig(const QJsonObject &j);
 
     void addConfig(QJsonObject j);
-    QJsonObject guiConfig;
 
+    QJsonObject guiConfig;
 };
 
 #endif // GUICONFIG_H
