@@ -21,7 +21,7 @@ else ()
     set(CMAKE_CXX_COMPILER "clang++")
 endif ()
 
-file(GLOB_RECURSE SOURCES "*.cpp")
+file(GLOB_RECURSE SOURCES "*.cpp" "*.cc")
 file(GLOB_RECURSE HEADERS "*.h")
 file(GLOB_RECURSE FORMS "*.ui")
 file(GLOB_RECURSE RESOURCES "*.qrc")
@@ -32,10 +32,10 @@ find_package(Qt5 REQUIRED ${QT})
 
 pkg_check_modules(3rd_lib REQUIRED
         dtkwidget
-	dframeworkdbus
+        dframeworkdbus
         dtkcore
         libqrencode
-	zbar
+        zbar
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${FORMS} ${RESOURCES})
