@@ -4,31 +4,49 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QRegExp>
+#include <types/server.h>
 #include "JConfig.h"
 
 namespace config {
 
-  class Server : public JConfig {
+class Server : JConfig, public QSS::Server {
 
-  public:
-    QString server;
-    QString passwd;
-    QString method;
-    QString remarks;
-    uint16_t server_port{};
-    uint16_t timeout{};
+public:
+  Server();
 
-    Server();
-    explicit Server(QJsonObject &json);
+  explicit Server(QJsonObject &json);
 
-    uint64_t hash();
-    void fromJson(QJsonObject &json) override;
-    QJsonObject toJson() override;
-    QString toUri();
-    bool fromUri(const QString &uri);
+  Server &operator=(Server const &s) {
+    server = s.server;
+    passwd = s.passwd;
+    method = s.method;
+    remarks = s.remarks;
+    server_port = s.server_port;
+    timeout = s.timeout;
+    return *this;
+  }
 
-    static QJsonArray toJson(QList<Server> &list);
-    static QList<Server> fromJson(QJsonArray &array);
-  };
+  uint64_t hash();
+
+  void fromJson(QJsonObject &json) override;
+
+  QJsonObject toJson() override;
+
+  QString toUri();
+
+  bool fromUri(const QString &uri);
+
+  static QJsonArray toJson(QList<Server> &list);
+
+  template<typename T = QSS::Server>
+  static QList<T> fromJson(QJsonArray &array) {
+    QList<T> list;
+    for (auto j : array) {
+      auto json = j.toObject();
+      list.append(Server(json));
+    }
+    return list;
+  }
+};
 
 }

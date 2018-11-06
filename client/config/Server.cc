@@ -2,14 +2,7 @@
 
 namespace config {
 
-Server::Server()
-  : server(""),
-    passwd(""),
-    method(""),
-    remarks(""),
-    server_port(8388),
-    timeout(5)
-{}
+Server::Server() : QSS::Server() {}
 
 Server::Server(QJsonObject &json) {
   fromJson(json);
@@ -89,15 +82,6 @@ QJsonArray Server::toJson(QList<Server> &list) {
     array.append(s.toJson());
   }
   return array;
-}
-
-QList<Server> Server::fromJson(QJsonArray &array) {
-  QList<Server> list;
-  for (auto j : array) {
-    auto json = j.toObject();
-    list.append(Server(json));
-  }
-  return list;
 }
 
 }

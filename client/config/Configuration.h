@@ -3,17 +3,16 @@
 #include "JConfig.h"
 #include "Server.h"
 #include "Proxy.h"
+#include "types/configuration.h"
 
 namespace config {
 
-  class Configuration : JConfig {
+class Configuration : JConfig, public QSS::Configuration {
 
   public:
-    QList<Server> servers;
-    Proxy proxy;
-
     Configuration();
     explicit Configuration(QJsonObject &json);
+    ~Configuration() override;
 
     void fromJson(QJsonObject &json) override;
     QJsonObject toJson() override;

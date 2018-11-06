@@ -2,13 +2,7 @@
 
 namespace config {
 
-Proxy::Proxy()
-  : use(false),
-    type(SOCKS5),
-    server(""),
-    port(0),
-    timeout(3)
-{}
+Proxy::Proxy() : QSS::Proxy() {}
 
 Proxy::Proxy(QJsonObject &json) {
   fromJson(json);
@@ -19,8 +13,8 @@ void Proxy::fromJson(QJsonObject &json) {
     use = json["useProxy"].toBool();
     type = json["proxyType"].toInt();
     server = json["proxyServer"].toString();
-    port = json["proxyPort"].toInt();
-    timeout = json["proxyTimeout"].toInt();
+    port = static_cast<uint16_t>(json["proxyPort"].toInt());
+    timeout = static_cast<uint16_t>(json["proxyTimeout"].toInt());
   } else {
     *this = Proxy();
   }
