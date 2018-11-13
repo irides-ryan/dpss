@@ -2,7 +2,7 @@
 
 namespace config {
 
-Server::Server() : QSS::Server() {}
+Server::Server() : QSX::Server() {}
 
 Server::Server(QJsonObject &json) {
   fromJson(json);

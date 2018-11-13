@@ -7,7 +7,7 @@
 
 namespace config {
 
-class Configuration : JConfig, public QSS::Configuration {
+class Configuration : JConfig, public QSX::Configuration {
 
   public:
     Configuration();

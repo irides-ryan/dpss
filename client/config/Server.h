@@ -9,7 +9,7 @@
 
 namespace config {
 
-class Server : JConfig, public QSS::Server {
+class Server : JConfig, public QSX::Server {
 
 public:
   Server();
@@ -38,7 +38,7 @@ public:
 
   static QJsonArray toJson(QList<Server> &list);
 
-  template<typename T = QSS::Server>
+  template<typename T = QSX::Server>
   static QList<T> fromJson(QJsonArray &array) {
     QList<T> list;
     for (auto j : array) {

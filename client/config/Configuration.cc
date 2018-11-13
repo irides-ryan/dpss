@@ -2,7 +2,7 @@
 
 namespace config {
 
-Configuration::Configuration() : QSS::Configuration() {}
+Configuration::Configuration() : QSX::Configuration() {}
 
 Configuration::Configuration(QJsonObject &json) {
   fromJson(json);
@@ -11,7 +11,7 @@ Configuration::Configuration(QJsonObject &json) {
 void Configuration::fromJson(QJsonObject &json) {
   if (!json.isEmpty()) {
     auto _servers = json["configs"].toArray();
-    m_servers = Server::fromJson<QSS::Server>(_servers);
+    m_servers = Server::fromJson(_servers);
     auto _proxy = json["proxy"].toObject();
     ((Proxy &)m_proxy).fromJson(_proxy);
     m_shareOverLan = json["shareOverLan"].toBool();
@@ -27,7 +27,7 @@ QJsonObject Configuration::toJson() {
 }
 
 Configuration::~Configuration() {
-  QSS::Configuration::unregisterChooser();
+  QSX::Configuration::unregisterChooser();
 }
 
 }
@@ -35,11 +35,11 @@ Configuration::~Configuration() {
 #include "types/configuration.h"
 #include "types/server.h"
 
-using QSS::IChooser;
-using QSS::Server;
+using QSX::IChooser;
+using QSX::Server;
 
 class SingleChooser : public IChooser {
-  Server getServer() override {
+  Server getServer(QSS::Address &destination) override {
     return Server();
   }
 };

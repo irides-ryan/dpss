@@ -6,7 +6,7 @@
 
 namespace config {
 
-class Proxy : JConfig, public QSS::Proxy {
+class Proxy : JConfig, public QSX::Proxy {
 
 public:
   Proxy();

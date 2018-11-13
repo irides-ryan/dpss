@@ -2,7 +2,7 @@
 
 namespace config {
 
-Proxy::Proxy() : QSS::Proxy() {}
+Proxy::Proxy() : QSX::Proxy() {}
 
 Proxy::Proxy(QJsonObject &json) {
   fromJson(json);
