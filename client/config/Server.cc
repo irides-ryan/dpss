@@ -4,6 +4,15 @@ namespace config {
 
 Server::Server() : QSX::Server() {}
 
+Server::Server(QSX::Server &s) {
+  server = s.server;
+  passwd = s.passwd;
+  method = s.method;
+  remarks = s.remarks;
+  server_port = s.server_port;
+  timeout = s.timeout;
+}
+
 Server::Server(QJsonObject &json) {
   fromJson(json);
 }
@@ -11,11 +20,11 @@ Server::Server(QJsonObject &json) {
 uint64_t Server::hash() {
   QString s;
   s.append(server)
-      .append(QString::number(server_port))
-      .append(passwd)
-      .append(method)
-      .append(remarks)
-      .append(QString::number(timeout));
+    .append(QString::number(server_port))
+    .append(passwd)
+    .append(method)
+    .append(remarks)
+    .append(QString::number(timeout));
   return QCryptographicHash::hash(s.toLatin1(),
                                   QCryptographicHash::Sha256).toULong();
 }
@@ -46,13 +55,13 @@ QJsonObject Server::toJson() {
 
 QString Server::toUri() {
   QString s = QString("%1:%2@%3:%4")
-      .arg(method)
-      .arg(passwd)
-      .arg(server)
-      .arg(server_port);
+    .arg(method)
+    .arg(passwd)
+    .arg(server)
+    .arg(server_port);
   return QString("ss://%1#%2")
-      .arg(QString(s.toLocal8Bit().toBase64()))
-      .arg(remarks);
+    .arg(QString(s.toLocal8Bit().toBase64()))
+    .arg(remarks);
 }
 
 bool Server::fromUri(const QString &uri) {
@@ -74,14 +83,6 @@ bool Server::fromUri(const QString &uri) {
   server = r_decoded.cap(3);
   server_port = static_cast<uint16_t>(r_decoded.cap(4).toInt());
   return true;
-}
-
-QJsonArray Server::toJson(QList<Server> &list) {
-  QJsonArray array;
-  for (auto &s : list) {
-    array.append(s.toJson());
-  }
-  return array;
 }
 
 }

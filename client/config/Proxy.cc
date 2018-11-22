@@ -4,6 +4,14 @@ namespace config {
 
 Proxy::Proxy() : QSX::Proxy() {}
 
+Proxy::Proxy(QSX::Proxy &p) {
+  use = p.use;
+  type = p.type;
+  server = p.server;
+  port = p.port;
+  timeout = p.timeout;
+}
+
 Proxy::Proxy(QJsonObject &json) {
   fromJson(json);
 }

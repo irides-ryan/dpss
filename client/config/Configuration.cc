@@ -13,7 +13,7 @@ void Configuration::fromJson(QJsonObject &json) {
     auto _servers = json["configs"].toArray();
     m_servers = Server::fromJson(_servers);
     auto _proxy = json["proxy"].toObject();
-    ((Proxy &)m_proxy).fromJson(_proxy);
+    m_proxy = Proxy::fromJson(_proxy);
 
     m_shareOverLan = json["shareOverLan"].toBool();
     m_localPort = static_cast<uint16_t>(json["localPort"].toInt());
@@ -30,8 +30,8 @@ void Configuration::fromJson(QJsonObject &json) {
 
 QJsonObject Configuration::toJson() {
   QJsonObject json;
-  json.insert("configs", ((Server*)&m_servers)->toJson());
-  json.insert("proxy", ((Proxy*)&m_proxy)->toJson());
+  json.insert("configs", Server::toJson(m_servers));
+  json.insert("proxy", Proxy::toJson(m_proxy));
 
   json.insert("localPort", m_localPort);
   json.insert("shareOverLan", m_shareOverLan);
