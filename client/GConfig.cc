@@ -1,10 +1,11 @@
 #include <QtCore/QJsonDocument>
 #include "GConfig.h"
 #include "utils.h"
+#include "config/Configuration.h"
 
 GConfig::GConfig()
   : m_configPath(QDir(Utils::configPath()).filePath(CONFIG_FILE)) {
-
+  Load();
 }
 
 GConfig::~GConfig() {
