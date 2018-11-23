@@ -13,8 +13,8 @@ class Server : JConfig, public QSX::Server {
 
 public:
   Server();
-  explicit Server(QSX::Server &server);
-  explicit Server(QJsonObject &json);
+  explicit Server(const QSX::Server &server);
+  explicit Server(const QJsonObject &json);
   ~Server() override = default;
 
   Server &operator=(Server const &s) {
@@ -29,7 +29,7 @@ public:
 
   uint64_t hash();
 
-  void fromJson(QJsonObject &json) override;
+  void fromJson(const QJsonObject &json) override;
 
   QJsonObject toJson() override;
 
@@ -38,7 +38,7 @@ public:
   bool fromUri(const QString &uri);
 
   template<typename T = QSX::Server>
-  static QJsonArray toJson(QList<T> &list) {
+  static QJsonArray toJson(const QList<T> &list) {
     QJsonArray array;
     for (auto &s : list) {
       array.append(Server(s).toJson());
@@ -47,7 +47,7 @@ public:
   }
 
   template<typename T = QSX::Server>
-  static QList<T> fromJson(QJsonArray &array) {
+  static QList<T> fromJson(const QJsonArray &array) {
     QList<T> list;
     for (auto j : array) {
       auto json = j.toObject();

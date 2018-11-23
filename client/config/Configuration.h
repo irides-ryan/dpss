@@ -24,10 +24,10 @@ private:
 
 public:
   Configuration();
-  explicit Configuration(QJsonObject &json);
+  explicit Configuration(const QJsonObject &json);
   ~Configuration() override;
 
-  void fromJson(QJsonObject &json) override;
+  void fromJson(const QJsonObject &json) override;
   QJsonObject toJson() override;
 };
 

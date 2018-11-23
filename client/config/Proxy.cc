@@ -4,7 +4,7 @@ namespace config {
 
 Proxy::Proxy() : QSX::Proxy() {}
 
-Proxy::Proxy(QSX::Proxy &p) {
+Proxy::Proxy(const QSX::Proxy &p) {
   use = p.use;
   type = p.type;
   server = p.server;
@@ -12,11 +12,11 @@ Proxy::Proxy(QSX::Proxy &p) {
   timeout = p.timeout;
 }
 
-Proxy::Proxy(QJsonObject &json) {
+Proxy::Proxy(const QJsonObject &json) {
   fromJson(json);
 }
 
-void Proxy::fromJson(QJsonObject &json) {
+void Proxy::fromJson(const QJsonObject &json) {
   if (!json.isEmpty()) {
     use = json["useProxy"].toBool();
     type = json["proxyType"].toInt();

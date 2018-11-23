@@ -4,7 +4,7 @@ namespace config {
 
 Server::Server() : QSX::Server() {}
 
-Server::Server(QSX::Server &s) {
+Server::Server(const QSX::Server &s) {
   server = s.server;
   passwd = s.passwd;
   method = s.method;
@@ -13,7 +13,7 @@ Server::Server(QSX::Server &s) {
   timeout = s.timeout;
 }
 
-Server::Server(QJsonObject &json) {
+Server::Server(const QJsonObject &json) {
   fromJson(json);
 }
 
@@ -29,7 +29,7 @@ uint64_t Server::hash() {
                                   QCryptographicHash::Sha256).toULong();
 }
 
-void Server::fromJson(QJsonObject &json) {
+void Server::fromJson(const QJsonObject &json) {
   if (!json.isEmpty()) {
     server = json["server"].toString();
     server_port = static_cast<uint16_t>(json["server_port"].toInt());

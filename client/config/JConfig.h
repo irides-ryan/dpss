@@ -8,7 +8,7 @@ namespace config {
 
   public:
     virtual QJsonObject toJson() = 0;
-    virtual void fromJson(QJsonObject &json) = 0;
+    virtual void fromJson(const QJsonObject &json) = 0;
 
     virtual ~JConfig() = default;
   };

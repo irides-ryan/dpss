@@ -4,11 +4,11 @@ namespace config {
 
 Configuration::Configuration() : QSX::Configuration() {}
 
-Configuration::Configuration(QJsonObject &json) {
+Configuration::Configuration(const QJsonObject &json) {
   fromJson(json);
 }
 
-void Configuration::fromJson(QJsonObject &json) {
+void Configuration::fromJson(const QJsonObject &json) {
   if (!json.isEmpty()) {
     auto _servers = json["configs"].toArray();
     m_servers = Server::fromJson(_servers);

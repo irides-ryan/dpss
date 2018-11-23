@@ -10,8 +10,8 @@ class Proxy : JConfig, public QSX::Proxy {
 
 public:
   Proxy();
-  explicit Proxy(QSX::Proxy &p);
-  explicit Proxy(QJsonObject &json);
+  explicit Proxy(const QSX::Proxy &p);
+  explicit Proxy(const QJsonObject &json);
   ~Proxy() override = default;
 
   Proxy &operator=(Proxy const &proxy) {
@@ -23,7 +23,7 @@ public:
     return *this;
   }
 
-  void fromJson(QJsonObject &json) override;
+  void fromJson(const QJsonObject &json) override;
 
   QJsonObject toJson() override;
 
@@ -33,7 +33,7 @@ public:
   }
 
   template<typename T = QSX::Proxy>
-  static T fromJson(QJsonObject &json) {
+  static T fromJson(const QJsonObject &json) {
     Proxy p(json);
     return p;
   }
