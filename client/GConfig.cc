@@ -5,14 +5,14 @@
 
 GConfig::GConfig()
   : m_configPath(QDir(Utils::configPath()).filePath(CONFIG_FILE)) {
-  Load();
+  load();
 }
 
 GConfig::~GConfig() {
-
+  save();
 }
 
-void GConfig::Load(QString const &path) {
+void GConfig::load(QString const &path) {
   QFile file(path);
   QFileInfo fileInfo(file);
   QDir dir = fileInfo.absoluteDir();
@@ -45,7 +45,7 @@ void GConfig::Load(QString const &path) {
   }
 }
 
-void GConfig::Save(QString const &path) {
+void GConfig::save(QString const &path) {
   QFile file(path);
   QFileInfo fileInfo(file);
   QDir dir = fileInfo.absoluteDir();
@@ -67,10 +67,10 @@ void GConfig::Save(QString const &path) {
   }
 }
 
-void GConfig::Load() {
-  Load(m_configPath);
+void GConfig::load() {
+  load(m_configPath);
 }
 
-void GConfig::Save() {
-  Save(m_configPath);
+void GConfig::save() {
+  save(m_configPath);
 }

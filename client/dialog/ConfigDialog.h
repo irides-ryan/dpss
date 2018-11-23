@@ -21,6 +21,7 @@
 #ifndef CONFIGDIALOG_H
 #define CONFIGDIALOG_H
 
+#include <config/Server.h>
 #include "stdafx.h"
 
 namespace Ui {
@@ -32,13 +33,13 @@ class ConfigDialog : public QDialog {
 
 public:
     explicit ConfigDialog(QWidget *parent = nullptr);
-    ~ConfigDialog();
-    bool isConfigChanged();
+    ~ConfigDialog() override;
 
+    bool isConfigChanged();
 
 private:
     Ui::ConfigDialog *ui;
-    QJsonArray m_configs;
+    QList<QSX::Server> m_servers;
     int m_currentPos;
     bool m_isConfigChanged;
 

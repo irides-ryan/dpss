@@ -1,3 +1,4 @@
+#include <GConfig.h>
 #include "ProxyDialog.h"
 #include "ui_ProxyDialog.h"
 
@@ -11,41 +12,19 @@ ProxyDialog::ProxyDialog(QWidget *parent) :
     ui->lineEditProxyPort->setValidator(new QIntValidator(0, 65535, this));
     ui->lineEditTimeout->setValidator(new QIntValidator(0, 99, this));
 
-    bool usePorxy = false;
-    int  proxyType = 0;
-    QString proxyServer = "127.0.0.1";
-    int  proxyPort = 8080;
-    int  proxyTimeout = 3;
+    m_proxy = GConfig::instance()->config().getProxy();
 
-    auto configProxy = GuiConfig::instance()->get("proxy");
-    if (configProxy.isUndefined()) {
-        // then define it
-        m_confProxy.insert("useProxy", usePorxy);
-        m_confProxy.insert("proxyType", proxyType);
-        m_confProxy.insert("proxyServer", proxyServer);
-        m_confProxy.insert("proxyPort", proxyPort);
-        m_confProxy.insert("proxyTimeout", proxyTimeout);
-        GuiConfig::instance()->set("proxy", m_confProxy);
-    } else {
-        m_confProxy = configProxy.toObject();
-        usePorxy = m_confProxy["useProxy"].toBool(false);
-        proxyType = m_confProxy["proxyType"].toInt(0);
-        proxyServer = m_confProxy["proxyServer"].toString();
-        proxyPort = m_confProxy["proxyPort"].toInt(8080);
-        proxyTimeout = m_confProxy["proxyTimeout"].toInt(3);
-    }
+    ui->checkBoxUseProxy->setChecked(m_proxy.use);
+    emit ui->checkBoxUseProxy->stateChanged(m_proxy.use);
 
-    ui->checkBoxUseProxy->setChecked(usePorxy);
-    emit ui->checkBoxUseProxy->stateChanged(usePorxy);
-
-    if (proxyType == 0) {
+    if (m_proxy.type == 0) {
         ui->comboBoxProxyType->setCurrentIndex(0);
     } else {
         ui->comboBoxProxyType->setCurrentIndex(1);
     }
-    ui->lineEditProxyAddr->setText(proxyServer);
-    ui->lineEditProxyPort->setText(QString::number(proxyPort));
-    ui->lineEditTimeout->setText(QString::number(proxyTimeout));
+    ui->lineEditProxyAddr->setText(m_proxy.server);
+    ui->lineEditProxyPort->setText(QString::number(m_proxy.port));
+    ui->lineEditTimeout->setText(QString::number(m_proxy.timeout));
 }
 
 ProxyDialog::~ProxyDialog() {
@@ -74,15 +53,16 @@ void ProxyDialog::on_checkBoxUseProxy_stateChanged(int state)
 void ProxyDialog::on_buttonBox_accepted()
 {
     // TODO verify the "proxyServer"
+    QSX::Proxy _proxy = GConfig::instance()->config().getProxy();
 
-    m_confProxy["useProxy"] = ui->checkBoxUseProxy->isChecked();
-    m_confProxy["proxyType"] = ui->comboBoxProxyType->currentIndex();
-    m_confProxy["proxyServer"] = ui->lineEditProxyAddr->text();
-    m_confProxy["proxyPort"] = ui->lineEditProxyPort->text().toInt();
-    m_confProxy["proxyTimeout"] = ui->lineEditTimeout->text().toInt();
+    m_proxy.use = ui->checkBoxUseProxy->isChecked();
+    m_proxy.type = ui->comboBoxProxyType->currentIndex();
+    m_proxy.server = ui->lineEditProxyAddr->text();
+    m_proxy.port = static_cast<uint16_t>(ui->lineEditProxyPort->text().toInt());
+    m_proxy.timeout = static_cast<uint16_t>(ui->lineEditTimeout->text().toInt());
 
-    if (GuiConfig::instance()->set("proxy", m_confProxy)) {
-        m_isConfigChanged = true;
-        GuiConfig::instance()->saveToDisk();
+    m_isConfigChanged = _proxy == m_proxy;
+    if (m_isConfigChanged) {
+        GConfig::instance()->config().setProxy(m_proxy);
     }
 }

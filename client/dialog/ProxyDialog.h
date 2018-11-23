@@ -22,6 +22,7 @@
 #define PROXYDIALOG_H
 
 #include <QDialog>
+#include <config/Proxy.h>
 #include "stdafx.h"
 
 namespace Ui {
@@ -32,22 +33,19 @@ class ProxyDialog : public QDialog {
     Q_OBJECT
 
 public:
-    explicit ProxyDialog(QWidget *parent = 0);
-
-    ~ProxyDialog();
+    explicit ProxyDialog(QWidget *parent = nullptr);
+    ~ProxyDialog() override;
 
     bool isConfigChanged();
 
 private slots:
     void on_checkBoxUseProxy_stateChanged(int state);
-
     void on_buttonBox_accepted();
 
 private:
     Ui::ProxyDialog *ui;
-
     QJsonObject m_confProxy;
-
+    QSX::Proxy m_proxy;
     bool m_isConfigChanged = false;
 };
 

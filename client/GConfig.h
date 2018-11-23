@@ -13,9 +13,6 @@ private:
   config::Configuration m_config;
   const QString m_configPath;
 
-  void Load(QString const &path);
-  void Save(QString const &path);
-
 public:
   GConfig();
   ~GConfig() override;
@@ -25,8 +22,10 @@ public:
     return &m_instance;
   }
 
-  void Load();
-  void Save();
+  void load(QString const &path);
+  void save(QString const &path);
+  void load();
+  void save();
 
   config::Configuration &config() {
     return m_config;
@@ -34,6 +33,36 @@ public:
 
   void config(config::Configuration &config) {
     m_config = config;
+  }
+
+  config::Server currentServer() {
+    auto index = m_config.m_index;
+    auto &servers = m_config.m_servers;
+    if (servers.empty()) {
+      return config::Server();
+    }
+    if (index >= servers.size()) {
+      index = 0;
+    }
+    auto &server = servers.at(index);
+    return config::Server(server);
+  }
+
+  bool addServer(QString const &url) {
+    config::Server s;
+    bool isGood = s.fromUri(url);
+    if (isGood) {
+      m_config.m_servers.append(s);
+    }
+    return isGood;
+  }
+
+  QList<QString> remarks() {
+    QList<QString> remarks;
+    for (auto &s : m_config.m_servers) {
+      remarks.append(s.remarks);
+    }
+    return remarks;
   }
 
 // Getter and Setter

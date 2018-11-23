@@ -29,6 +29,7 @@
 #include "Settings.h"
 #include "Toolbar.h"
 #include "widget/ProfileView.h"
+#include "scontroller.h"
 
 DWIDGET_USE_NAMESPACE
 using StartManagerInter = com::deepin::StartManager;
@@ -46,21 +47,20 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QSystemTrayIcon *systemTrayIcon;
+    QSystemTrayIcon *m_sysTray;
 
-    ProxyManager *proxyManager;
-    SystemProxyModeManager *systemProxyModeManager;
+    SController *m_controller;
+    SystemProxyModeManager *m_sysProxyModeMgr;
     StartManagerInter startManagerInter;
+    QTimer *m_timer;
 
-    quint64 in;
-    quint64 out;
-    quint64 term_usage_in;
-    quint64 term_usage_out;
+    quint64 in = 0;
+    quint64 out = 0;
 
     void updateMenu();
     void switchToPacMode();
     void switchToGlobal();
-    bool startss();
+    bool start();
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
