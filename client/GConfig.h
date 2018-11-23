@@ -44,9 +44,13 @@ public:
   GET_SET(bool, shareOverLan)
   GET_SET(uint16_t, localPort)
   GET_SET(int, index)
-  GET_SET(bool, enable)
+  GET_SET(bool, enabled)
   GET_SET(bool, autoStart)
   GET_SET(bool, autoCheckUpdate)
   GET_SET(bool, global)
-
+  GET_SET(bool, isVerboseLogging)
+  GET_SET(bool, checkPreRelease)
+  GET_SET(QString, pacUrl);
+  GET_SET(bool, useOnlinePac);
+  GET_SET(bool, secureLocalPac);
 };

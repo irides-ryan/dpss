@@ -14,10 +14,15 @@ class Configuration : JConfig, public QSX::Configuration {
 
 private:
   int m_index = 0;
-  bool m_enable = false;
+  bool m_enabled = false;
   bool m_global = false;
   bool m_autoStart = false;
   bool m_autoCheckUpdate = false;
+  bool m_isVerboseLogging = false;
+  bool m_checkPreRelease = false;
+  QString m_pacUrl = "";
+  bool m_useOnlinePac = false;
+  bool m_secureLocalPac = false;
 
   // using global namespace
   friend class ::GConfig;
