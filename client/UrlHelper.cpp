@@ -1,7 +1,7 @@
-#include "URIHelper.h"
+#include "UrlHelper.h"
 #include <zbar.h>
 
-QImage URIHelper::convertToGrey(const QImage &input)
+QImage UrlHelper::convertToGrey(const QImage &input)
 {
     if (input.isNull()) {
         return QImage();
@@ -21,7 +21,7 @@ QImage URIHelper::convertToGrey(const QImage &input)
     return ret;
 }
 
-QString URIHelper::decodeImage(const QImage &img)
+QString UrlHelper::decodeImage(const QImage &img)
 {
     QString uri;
     QImage gimg = convertToGrey(img);

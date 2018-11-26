@@ -22,13 +22,8 @@
 #define MAINWINDOW_H
 
 #include "stdafx.h"
-#include "ProxyManager.h"
 #include "interface/SystemProxyModeManager.h"
 #include "dbusinterface/DBusStartManager.h"
-#include "GuiConfig.h"
-#include "Settings.h"
-#include "Toolbar.h"
-#include "widget/ProfileView.h"
 #include "scontroller.h"
 
 DWIDGET_USE_NAMESPACE

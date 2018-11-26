@@ -2,7 +2,6 @@
 #include "ProxyDialog.h"
 #include "ui_ProxyDialog.h"
 
-#include "GuiConfig.h"
 
 ProxyDialog::ProxyDialog(QWidget *parent) :
         QDialog(parent),

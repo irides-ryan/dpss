@@ -1,7 +1,6 @@
 #include <GConfig.h>
 #include "ConfigDialog.h"
 #include "ui_ConfigDialog.h"
-#include "GuiConfig.h"
 #include "utils.h"
 
 using QCS = Qt::CheckState;

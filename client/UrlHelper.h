@@ -18,30 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROCESSVIEW_H
-#define PROCESSVIEW_H
+#ifndef URIHELPER_H
+#define URIHELPER_H
 
-#include <DSimpleListView>
+#include <QString>
+#include <QImage>
 
-DWIDGET_USE_NAMESPACE
-
-class ProfileView : public DSimpleListView {
-    Q_OBJECT
-
+class UrlHelper
+{
 public:
-    ProfileView(QList<bool> columnHideFlags);
+    virtual ~UrlHelper() = 0;
 
-public slots:
-
-    void changeTheme(QString theme);
-
-    void initTheme();
-
-    // QWidget interface
-protected:
-    void contextMenuEvent(QContextMenuEvent *event) override;
-signals:
-    void rightClickBlank();
+    static QImage convertToGrey(const QImage &input);
+    static QString decodeImage(const QImage &img);
 };
 
-#endif
+#endif // URIHELPER_H

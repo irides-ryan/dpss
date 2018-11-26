@@ -1,5 +1,5 @@
 #include "QRCodeCapturer.h"
-#include "URIHelper.h"
+#include "UrlHelper.h"
 #include <QApplication>
 #include <QMoveEvent>
 #include <QResizeEvent>
@@ -36,7 +36,7 @@ QString QRCodeCapturer::scanEntireScreen()
          sc != screens.end();
          ++sc) {
         QImage raw_sc = (*sc)->grabWindow(qApp->desktop()->winId()).toImage();
-        QString result = URIHelper::decodeImage(raw_sc);
+        QString result = UrlHelper::decodeImage(raw_sc);
         if (!result.isNull()) {
             uri = result;
         }
@@ -71,7 +71,7 @@ void QRCodeCapturer::decodeCurrentRegion()
                                    geometry.y(),
                                    geometry.width(),
                                    geometry.height()).toImage();
-    QString result = URIHelper::decodeImage(raw_sc);
+    QString result = UrlHelper::decodeImage(raw_sc);
     if (!result.isNull()) {
         this->close();
         // moveEvent and resizeEvent both happen quite frequent

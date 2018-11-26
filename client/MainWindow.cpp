@@ -6,13 +6,8 @@
 #include "PACUrlDialog.h"
 #include "ProxyDialog.h"
 #include "LogMainWindow.h"
-#include "Toolbar.h"
-#include "GuiConfig.h"
 #include "DDEProxyModeManager.h"
-#include "widget/ProfileView.h"
-#include "widget/ProfileItem.h"
 #include "QRCodeCapturer.h"
-#include "SSValidator.h"
 #include "ShareDialog.h"
 #include "GConfig.h"
 #include <DDesktopServices>
@@ -28,7 +23,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     installEventFilter(this);
 
-    GuiConfig::instance()->readFromDisk();
     const auto &gConfig = GConfig::instance();
 
     m_sysTray->setContextMenu(ui->menuTray);
