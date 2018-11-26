@@ -7,7 +7,7 @@
 #include "ProxyDialog.h"
 #include "LogMainWindow.h"
 #include "DDEProxyModeManager.h"
-#include "QRCodeCapturer.h"
+#include "QRCaptor.h"
 #include "ShareDialog.h"
 #include "GConfig.h"
 #include <DDesktopServices>
@@ -341,7 +341,7 @@ void MainWindow::on_actionDisconnect_triggered() {
 }
 
 void MainWindow::on_actionScan_QRCode_from_Screen_triggered() {
-    QString uri = QRCodeCapturer::scanEntireScreen();
+    QString uri = QRCaptor::scanEntireScreen();
     if (uri.isNull()) {
         QMessageBox::critical(
           this,

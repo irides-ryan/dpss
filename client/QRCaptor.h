@@ -18,19 +18,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef URIHELPER_H
-#define URIHELPER_H
+#pragma once
 
-#include <QString>
-#include <QImage>
+#include <QMainWindow>
 
-class UrlHelper
-{
+class QRCaptor : public QMainWindow {
+Q_OBJECT
+
 public:
-    virtual ~UrlHelper() = 0;
+  explicit QRCaptor(QWidget *parent = nullptr);
+  ~QRCaptor() override;
 
-    static QImage convertToGrey(const QImage &input);
-    static QString decodeImage(const QImage &img);
+  static QString scanEntireScreen();
+
+signals:
+  void qrCodeFound(const QString &result);
+  void closed();
+
+protected slots:
+  void moveEvent(QMoveEvent *e) override;
+  void resizeEvent(QResizeEvent *e) override;
+  void closeEvent(QCloseEvent *e) override;
+
+private:
+  void decodeCurrentRegion();
+  static QString decodeImage(const QImage &image);
 };
-
-#endif // URIHELPER_H
