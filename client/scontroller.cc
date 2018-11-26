@@ -14,6 +14,8 @@ bool SController::start() {
 
   auto config = GConfig::instance()->config();
   m_listener = std::make_unique<QSX::Listener>();
+  QObject::connect(m_listener.get(), &QSX::Listener::accept,
+                   this, &SController::accept);
   return m_listener->start(config);
 }
 

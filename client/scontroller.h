@@ -17,4 +17,8 @@ public:
   bool isRunning() {
     return true;
   }
+
+signals:
+  void accept(QSX::TcpHandler *handler);
+
 };
