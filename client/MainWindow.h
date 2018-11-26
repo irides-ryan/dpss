@@ -32,47 +32,47 @@ class MainWindow;
 }
 
 class MainWindow : public DMainWindow {
-    Q_OBJECT
+Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow() override;
-    bool eventFilter(QObject *, QEvent *) override ;
+  explicit MainWindow(QWidget *parent = nullptr);
+  ~MainWindow() override;
+  bool eventFilter(QObject *, QEvent *) override;
 
 private:
-    Ui::MainWindow *ui;
-    QSystemTrayIcon *m_sysTray;
+  Ui::MainWindow *ui;
+  QSystemTrayIcon *m_sysTray;
 
-    SController *m_controller;
-    SystemProxyModeManager *m_sysProxyModeMgr;
-    StartManagerInter startManagerInter;
-    QTimer *m_timer;
+  SController *m_controller;
+  SystemProxyModeManager *m_sysProxyModeMgr;
+  StartManagerInter startManagerInter;
+  QTimer *m_timer;
 
-    quint64 in = 0;
-    quint64 out = 0;
+  quint64 in = 0;
+  quint64 out = 0;
 
-    void updateMenu();
-    void switchToPacMode();
-    void switchToGlobal();
+  void updateMenu();
+  void switchToPacMode();
+  void switchToGlobal();
 
 protected:
-    void contextMenuEvent(QContextMenuEvent *event) override;
+  void contextMenuEvent(QContextMenuEvent *event) override;
 
 private slots:
-    void on_actionEdit_Servers_triggered();
-    void on_actionEdit_Online_PAC_URL_triggered();
-    void on_actionForward_Proxy_triggered();
-    void on_actionShow_Logs_triggered();
-    void on_actionImport_from_gui_config_json_triggered();
-    void on_actionEnable_System_Proxy_triggered(bool flag);
-    void on_actionPAC_triggered(bool checked);
-    void on_actionGlobal_triggered(bool checked);
-    void updateTrayIcon();
-    void on_actionStart_on_Boot_triggered(bool checked);
-    void on_actionQuit_triggered();
-    void on_actionDisconnect_triggered();
-    void on_actionScan_QRCode_from_Screen_triggered();
-    void on_actionImport_URL_from_Clipboard_triggered();
-    void on_actionShare_Server_Config_triggered();
-    void on_actionExport_as_gui_config_json_triggered();
+  void on_actionEdit_Servers_triggered();
+  void on_actionEdit_Online_PAC_URL_triggered();
+  void on_actionForward_Proxy_triggered();
+  void on_actionShow_Logs_triggered();
+  void on_actionImport_from_gui_config_json_triggered();
+  void on_actionEnable_System_Proxy_triggered(bool flag);
+  void on_actionPAC_triggered(bool checked);
+  void on_actionGlobal_triggered(bool checked);
+  void updateTrayIcon();
+  void on_actionStart_on_Boot_triggered(bool checked);
+  void on_actionQuit_triggered();
+  void on_actionDisconnect_triggered();
+  void on_actionScan_QRCode_from_Screen_triggered();
+  void on_actionImport_URL_from_Clipboard_triggered();
+  void on_actionShare_Server_Config_triggered();
+  void on_actionExport_as_gui_config_json_triggered();
 };
