@@ -1,30 +1,26 @@
-#ifndef SHAREDIALOG_H
-#define SHAREDIALOG_H
+#pragma once
+
 #include "stdafx.h"
 #include "widget/QRWidget.h"
 #include "widget/SingleListView.h"
 
-class ShareDialog : public QDialog
-{
-    Q_OBJECT
+class ShareDialog : public QDialog {
+Q_OBJECT
 
 public:
-    explicit ShareDialog(QWidget *parent = 0);
-    virtual ~ShareDialog();
-    void closeEvent(QCloseEvent *);
+  explicit ShareDialog(QWidget *parent = nullptr);
+  ~ShareDialog() override;
+
 private slots:
-    void onItemSelected();
-    void onSaveQRCodeImage();
+  void onItemSelected();
+  void onSaveQRCodeImage();
+
 private:
-    SingleListView* listView;
-    QRWidget* qrWidget;
-    QLabel* uriLabel;
-    QPlainTextEdit* uriText;
-    QPushButton* saveButton;
+  SingleListView *m_listView;
+  QRWidget *m_widgetQR;
+  QLineEdit *m_labelUrl;
+  QPushButton *m_btnSave;
+  QGridLayout *m_layout;
 
-    QString currentURI;
-
-    void setCurrentURI(QString uri);
+  void setCurrentUrl(QString url);
 };
-
-#endif // SHAREDIALOG_H
