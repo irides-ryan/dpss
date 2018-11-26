@@ -18,8 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include "stdafx.h"
 #include "interface/SystemProxyModeManager.h"
@@ -55,7 +54,6 @@ private:
     void updateMenu();
     void switchToPacMode();
     void switchToGlobal();
-    bool start();
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
@@ -78,5 +76,3 @@ private slots:
     void on_actionShare_Server_Config_triggered();
     void on_actionExport_as_gui_config_json_triggered();
 };
-
-#endif // MAINWINDOW_H

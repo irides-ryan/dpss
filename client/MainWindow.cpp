@@ -15,7 +15,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     DMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_sysTray(new QSystemTrayIcon),
+    m_sysTray(new QSystemTrayIcon(this)),
     m_controller(new SController(this)),
     m_sysProxyModeMgr(new DDEProxyModeManager(this)),
     m_timer(new QTimer(this)) {
@@ -28,8 +28,6 @@ MainWindow::MainWindow(QWidget *parent) :
     m_sysTray->setContextMenu(ui->menuTray);
     m_sysTray->setIcon(QIcon(Utils::getIconQrcPath("ss16.png")));
     m_sysTray->show();
-
-    m_sysProxyModeMgr = new DDEProxyModeManager(this);
 
     if (gConfig->enabled()) {
       emit ui->actionEnable_System_Proxy->triggered(true);
@@ -186,9 +184,6 @@ void MainWindow::switchToGlobal() {
     m_sysProxyModeMgr->switchToManual("localhost", localPort);
 }
 
-bool MainWindow::start() {
-    return m_controller->start();
-}
 
 void MainWindow::contextMenuEvent(QContextMenuEvent *) {
     qDebug() << "right click";
@@ -220,7 +215,7 @@ void MainWindow::on_actionEdit_Servers_triggered() {
     dialog.exec();
     if (dialog.isConfigChanged()) {
         qDebug() << "Server Configuration Changed, reloading...";
-        start();
+        m_controller->start();
     }
     updateMenu();
 }
@@ -235,7 +230,7 @@ void MainWindow::on_actionForward_Proxy_triggered() {
     dialog.exec();
     if (dialog.isConfigChanged()) {
         qDebug() << "Forward Proxy Changed, reloading...";
-        start();
+        m_controller->start();
     }
 }
 
@@ -264,7 +259,7 @@ void MainWindow::on_actionEnable_System_Proxy_triggered(bool flag) {
         m_controller->stop();
         m_sysProxyModeMgr->switchToNone();
     } else {
-        start();
+        m_controller->start();
 
         if(gConfig->global()) {
             switchToGlobal();
