@@ -67,7 +67,21 @@ using QSX::IChooser;
 using QSX::Server;
 
 class SingleChooser : public IChooser {
-  Server getServer(QSS::Address &destination) override {
-    return Server();
+
+  config::Configuration m_config;
+
+  explicit SingleChooser(config::Configuration &configuration)
+    : m_config(configuration) {}
+
+  Server getServer(QSS::Address &destination, int index) override {
+    auto servers = m_config.getServers();
+    if (servers.empty()) {
+      return Server();
+    }
+    int i = index;
+    if (!(0 <= i && i < servers.length())) {
+      i = 0;
+    }
+    return servers[i];
   }
 };

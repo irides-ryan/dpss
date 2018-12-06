@@ -13,7 +13,6 @@ namespace config {
 class Configuration : JConfig, public QSX::Configuration {
 
 private:
-  int m_index = 0;
   bool m_enabled = false;
   bool m_global = false;
   bool m_autoStart = false;
