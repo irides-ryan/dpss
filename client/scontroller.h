@@ -5,7 +5,7 @@
 class SController : public QObject {
 Q_OBJECT
 private:
-  std::unique_ptr<QSX::Listener> m_listener;
+  QSX::Listener *m_listener = nullptr;
 
 public:
   explicit SController(QObject *parent = nullptr);
