@@ -79,6 +79,7 @@ void ConfigDialog::showConfig(int index) {
 }
 
 void ConfigDialog::save() {
+    stashConfig(m_currentPos);
 //    bool useMixedProxy = ui->checkBoxMixedPort->checkState() == QCS::Checked;
     auto localPort = static_cast<uint16_t>(ui->spinBoxProxyPort->value());
 
@@ -88,9 +89,9 @@ void ConfigDialog::save() {
     auto _localPort = GConfig::instance()->localPort();
 
     // check for changes
-    bool serversChanged = (m_servers == _servers);
+    bool serversChanged = (m_servers != _servers);
 //    bool proxyChanged = useMixedProxy == _useMixedProxy;
-    bool portChanged = localPort == _localPort;
+    bool portChanged = localPort != _localPort;
 
     m_isConfigChanged = serversChanged || portChanged;
     if (m_isConfigChanged) {
