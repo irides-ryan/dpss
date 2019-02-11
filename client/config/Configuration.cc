@@ -10,8 +10,8 @@ Configuration::Configuration(const QJsonObject &json) {
 
 void Configuration::fromJson(const QJsonObject &json) {
   if (!json.isEmpty()) {
-    m_servers = Server::fromJson(json["configs"].toArray());
-    m_proxy = Proxy::fromJson(json["proxy"].toObject());
+    m_servers = Server::FromJson(json["configs"].toArray());
+    m_proxy = Proxy::FromJson(json["proxy"].toObject());
 
     m_shareOverLan = json["shareOverLan"].toBool(false);
     m_localPort = static_cast<uint16_t>(json["localPort"].toInt(1080));
@@ -34,8 +34,8 @@ void Configuration::fromJson(const QJsonObject &json) {
 
 QJsonObject Configuration::toJson() {
   QJsonObject json;
-  json.insert("configs", Server::toJson(m_servers));
-  json.insert("proxy", Proxy::toJson(m_proxy));
+  json.insert("configs", Server::ToJson(m_servers));
+  json.insert("proxy", Proxy::ToJson(m_proxy));
 
   json.insert("localPort", m_localPort);
   json.insert("shareOverLan", m_shareOverLan);

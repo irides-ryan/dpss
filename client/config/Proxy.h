@@ -28,12 +28,12 @@ public:
   QJsonObject toJson() override;
 
   template<typename T = QSX::Proxy>
-  static QJsonObject toJson(T &t) {
+  static QJsonObject ToJson(T &t) {
     return Proxy(t).toJson();
   }
 
   template<typename T = QSX::Proxy>
-  static T fromJson(const QJsonObject &json) {
+  static T FromJson(const QJsonObject &json) {
     Proxy p(json);
     return p;
   }

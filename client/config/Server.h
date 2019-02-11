@@ -38,7 +38,7 @@ public:
   bool fromUri(const QString &uri);
 
   template<typename T = QSX::Server>
-  static QJsonArray toJson(const QList<T> &list) {
+  static QJsonArray ToJson(const QList<T> &list) {
     QJsonArray array;
     for (auto &s : list) {
       array.append(Server(s).toJson());
@@ -47,7 +47,7 @@ public:
   }
 
   template<typename T = QSX::Server>
-  static QList<T> fromJson(const QJsonArray &array) {
+  static QList<T> FromJson(const QJsonArray &array) {
     QList<T> list;
     for (auto j : array) {
       auto json = j.toObject();
