@@ -64,7 +64,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
                      QObject::connect(handler, &QSX::TcpHandler::finished,
                                       [=](int r) {
-                                        qDebug() << handler << "closed"
+                                        qDebug() << handler << "closed("
+                                                 << r << "),"
                                                  << "r:"
                                                  << handler->getCountRead()
                                                  << "w:"
