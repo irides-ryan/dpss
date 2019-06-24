@@ -103,6 +103,7 @@ void ConfigDialog::save() {
             GConfig::instance()->config().setServers(m_servers);
             GConfig::instance()->localPort(localPort);
 //            GuiConfig::instance()->set("useMixedProxy", useMixedProxy);
+            GConfig::instance()->save();
         }
     }
 }
